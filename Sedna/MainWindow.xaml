@@ -1,0 +1,99 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Width="1350"
+        Height="800"
+        x:Class="Sedna.MainWindow"
+        Title="Sedna">
+
+  <DockPanel>
+    <Menu DockPanel.Dock="Top">
+      <MenuItem Header="_File">
+
+      </MenuItem>
+    </Menu>
+    
+    <Grid RowDefinitions="5, *, 5, 180">
+
+      <Grid Grid.Row="1" ColumnDefinitions="150, *, 150">
+
+        <!-- Camera Control Column -->
+        <Grid Grid.Column="0" RowDefinitions="Auto,*">
+          <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="Camera Controls!"/>
+          <Border Grid.Row="1" Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="4">
+            <StackPanel Grid.Column="0" Margin="5">
+
+              <TextBlock Text="Camera:"/>
+              <ComboBox Name="CameraSelectionBox" Height="24">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding ModelName}" />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <TextBlock Height="5"/>
+              
+              <Button Name="CameraDetailsButton" Content="Camera Details" IsEnabled="False"/>
+              <TextBlock Height="5"/>
+
+              <Button Name="CameraRefreshButton" Content="Refresh Cameras" Click="RefreshCameras"/>
+              <TextBlock Height="20"/>
+
+              <TextBlock Text="ISO:"/>
+              <ComboBox Name="IsoBox" Height="24" SelectionChanged="IsoBox_SelectionChanged"/>
+              <TextBlock Height="20"/>
+              
+              <TextBlock Text="Exposure:"/>
+              <ButtonSpinner Name="ExposureBox"/>
+              <TextBlock Height="20"/>
+
+              <Button Name="CaptureButton" Content="Capture!" Click="CaptureButton_Click"/>
+              
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <!-- Viewfinder -->
+        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="0,21,0,5">
+          <Image Name="ViewfinderImage" />
+        </Border>
+
+        <!-- Motor Control Column -->
+        <Grid Grid.Column="2" RowDefinitions="Auto,*">
+          <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="Motor Controls!"/>
+          <Border Grid.Row="1" Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="4">
+            <StackPanel Grid.Column="0" Margin="5">
+
+              <Button Name="ToggleMotorButton" Content="Enable Motors"/>
+              <TextBlock Height="20"/>
+              
+              <TextBlock Text="X Deg/Sec:"/>
+              <TextBox Name="MotorXBox"/>
+              <TextBlock Height="20"/>
+
+              <TextBlock Text="Y Deg/Sec:"/>
+              <TextBox Name="MotorYBox"/>
+              <TextBlock Height="20"/>
+
+            </StackPanel>
+          </Border>
+        </Grid>
+        
+      </Grid>
+
+      <GridSplitter Grid.Row="2"/>
+
+      <!-- Log Box -->
+      <Grid Grid.Row="3" Margin="5" RowDefinitions="Auto,*">
+        <TextBlock Grid.Row="0" Text="Log:"/>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1" Margin="0,2,0,0">
+          <TextBox Name="LogBox" IsReadOnly="True"/>
+        </ScrollViewer>
+      </Grid>
+      
+    </Grid>
+  </DockPanel>
+
+</Window>
