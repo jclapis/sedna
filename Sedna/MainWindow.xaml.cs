@@ -60,21 +60,21 @@ namespace Sedna
 
 
         /// <summary>
+        /// The manager for the exposure setting box
+        /// </summary>
+        private readonly ButtonSpinnerSelectionHandler ExposureBox;
+
+
+        /// <summary>
         /// A logger for capturing status and debug messages
         /// </summary>
         private readonly Logger Logger;
 
 
         /// <summary>
-        /// The context for GPhoto2
+        /// The camera I/O and settings manager
         /// </summary>
-        private readonly Context Context;
-
-
-        /// <summary>
-        /// The cameras that are connected to the machine
-        /// </summary>
-        private IReadOnlyList<Camera> Cameras;
+        private readonly CameraManager CameraManager;
 
 
         /// <summary>
@@ -101,12 +101,18 @@ namespace Sedna
             CameraSelectionBox = this.FindControl<ComboBox>("CameraSelectionBox");
             ViewfinderImage = this.FindControl<Image>("ViewfinderImage");
             IsoBox = this.FindControl<ComboBox>("IsoBox");
+            ButtonSpinner exposureSpinner = this.FindControl<ButtonSpinner>("ExposureBox");
+            ExposureBox = new ButtonSpinnerSelectionHandler(exposureSpinner);
+            ExposureBox.SelectionChanged += ExposureBox_SelectionChanged;
 
             // Set up the viewfinder
             ViewfinderBitmap = new WriteableBitmap(new PixelSize(1920, 1080), new Vector(96, 96), PixelFormat.Bgra8888);
             ViewfinderImage.Source = ViewfinderBitmap;
 
-            Context = new Context();
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                CameraManager = new CameraManager(Logger);
+            }
         }
 
 
@@ -125,7 +131,10 @@ namespace Sedna
         /// <param name="e">Not used</param>
         protected override void OnClosed(EventArgs e)
         {
-            Context.Dispose();
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                CameraManager.Dispose();
+            }
         }
 
 
@@ -137,31 +146,34 @@ namespace Sedna
             try
             {
                 RefreshingCameras = true;
-                Logger.Debug("Refreshing cameras.");
-                Camera selectedCamera = (Camera)CameraSelectionBox.SelectedItem;
-                Cameras = Context.GetCameras();
-                Logger.Info($"Cameras refreshed, {Cameras.Count} found.");
-                CameraSelectionBox.Items = Cameras;
 
-                int newCameraIndex = 0;
-                if (selectedCamera != null)
+                CameraSelectionBox.Items = null;
+                IsoBox.Items = null;
+
+                IReadOnlyList<Camera> cameras = CameraManager?.RefreshCameras();
+                if(cameras == null)
                 {
-                    for (int i = 0; i < Cameras.Count; i++)
-                    {
-                        Camera camera = Cameras[i];
-                        if (camera.ModelName == selectedCamera.ModelName)
-                        {
-                            newCameraIndex = i;
-                        }
-                    }
+                    return;
                 }
 
-                if (newCameraIndex < Cameras.Count)
+                CameraSelectionBox.Items = cameras;
+                if(cameras.Count > 0)
                 {
-                    CameraSelectionBox.SelectedIndex = newCameraIndex;
-                }
+                    // Set the active camera to the first one in the list
+                    Camera activeCamera = cameras[0];
+                    CameraSelectionBox.SelectedIndex = 0;
+                    CameraManager.SetActiveCamera(activeCamera);
 
-                RefreshISOs();
+                    // Get the ISO settings
+                    (IReadOnlyList<string> isoOptions, string iso) = CameraManager.GetIsoSettings();
+                    IsoBox.Items = isoOptions;
+                    IsoBox.SelectedItem = iso;
+
+                    // Get the exposure settings
+                    (IReadOnlyList<string> exposureOptions, string exposure) = CameraManager.GetExposureSettings();
+                    ExposureBox.Items = exposureOptions;
+                    ExposureBox.SelectedItem = exposure;
+                }
             }
             catch(Exception ex)
             {
@@ -171,28 +183,6 @@ namespace Sedna
             {
                 RefreshingCameras = false;
             }
-        }
-
-
-        /// <summary>
-        /// Refreshes the list of ISO settings available in the current camera.
-        /// </summary>
-        private void RefreshISOs()
-        {
-            Camera camera = (Camera)CameraSelectionBox.SelectedItem;
-            if(camera == null)
-            {
-                return;
-            }
-
-            ConfigurationSection imageSettings = camera.Configuration.Sections.First(
-                candidate => candidate.Title == "Image Settings");
-            SelectionSetting isoSetting = (SelectionSetting)imageSettings.Settings.First(
-                candidate => candidate.Title == "ISO Speed");
-
-            IsoBox.Items = isoSetting.Options;
-            string currentSetting = isoSetting.Value;
-            IsoBox.SelectedItem = currentSetting;
         }
 
 
@@ -209,31 +199,25 @@ namespace Sedna
             }
 
             string setting = (string)IsoBox.SelectedItem;
-            if(setting == null)
+            CameraManager.SetIso(setting);
+        }
+
+
+        /// <summary>
+        /// Updates the camera when the user changes the exposure setting.
+        /// </summary>
+        /// <param name="sender">Not used</param>
+        /// <param name="NewSetting">The new exposure setting</param>
+        public void ExposureBox_SelectionChanged(object sender, string NewSetting)
+        {
+            if (RefreshingCameras)
             {
                 return;
             }
 
-            try
-            {
-                Camera camera = (Camera)CameraSelectionBox.SelectedItem;
-                if (camera == null)
-                {
-                    return;
-                }
-                ConfigurationSection imageSettings = camera.Configuration.Sections.First(
-                    candidate => candidate.Title == "Image Settings");
-                SelectionSetting isoSetting = (SelectionSetting)imageSettings.Settings.First(
-                    candidate => candidate.Title == "ISO Speed");
-
-                isoSetting.Value = setting;
-                camera.UpdateConfiguration();
-            }
-            catch(Exception ex)
-            {
-                Logger.Error($"Error updating ISO setting: {ex.Message}");
-            }
+            CameraManager.SetExposure(NewSetting);
         }
+
 
 
         /// <summary>
