@@ -38,9 +38,6 @@
               <Button Name="CameraDetailsButton" Content="Camera Details" IsEnabled="False"/>
               <TextBlock Height="5"/>
 
-              <Button Name="CameraRefreshButton" Content="Refresh Cameras" Click="RefreshCameras"/>
-              <TextBlock Height="20"/>
-
               <TextBlock Text="ISO:"/>
               <ComboBox Name="IsoBox" Height="24" SelectionChanged="IsoBox_SelectionChanged"/>
               <TextBlock Height="20"/>
@@ -58,9 +55,11 @@
         </Grid>
 
         <!-- Viewfinder -->
-        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="0,21,0,5">
-          <Image Name="ViewfinderImage" />
-        </Border>
+        <TabControl Name="ImageTabControl" Grid.Column="1" TabStripPlacement="Top" Margin="3">
+          <TabItem Header="Viewfinder">
+            <Image Name="ViewfinderImage" />
+          </TabItem>
+        </TabControl>
 
         <!-- Motor Control Column -->
         <Grid Grid.Column="2" RowDefinitions="Auto,*">

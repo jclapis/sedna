@@ -14,9 +14,12 @@
  * limitations under the License.
  * ======================================================================== */
 
+using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using GPhoto2.Net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Sedna
 {
@@ -110,8 +113,8 @@ namespace Sedna
                 return;
             }
 
-            ActiveCamera.Disconnect();
-            Camera.Connect();
+            //ActiveCamera?.Disconnect();
+            //Camera.Connect();
             ActiveCamera = Camera;
         }
 
@@ -167,6 +170,22 @@ namespace Sedna
 
 
         /// <summary>
+        /// Captures an image from the active camera.
+        /// </summary>
+        /// <returns>The image's data and its name</returns>
+        public (Bitmap ImageSource, string Filename) CaptureImage()
+        {
+            CameraFile file = ActiveCamera.Capture(CameraCaptureType.Image);
+
+            using(MemoryStream stream = new MemoryStream(file.Data))
+            {
+                Bitmap bitmap = new Bitmap(stream);
+                return (bitmap, file.Name);
+            }
+        }
+
+
+        /// <summary>
         /// Finds the setting in the given config with the provided title.
         /// </summary>
         /// <typeparam name="TSetting">The type of setting to find</typeparam>
@@ -201,16 +220,19 @@ namespace Sedna
                 if (disposing)
                 {
                     ActiveCamera = null;
-                    foreach(Camera camera in Cameras)
+                    if(Cameras != null)
                     {
-                        try
+                        foreach (Camera camera in Cameras)
                         {
-                            camera.Disconnect();
-                            camera.Dispose();
+                            try
+                            {
+                                camera.Disconnect();
+                                camera.Dispose();
+                            }
+                            catch (Exception) { }
                         }
-                        catch(Exception) { }
+                        Cameras = null;
                     }
-                    Cameras = null;
 
                     Context.Dispose();
                 }

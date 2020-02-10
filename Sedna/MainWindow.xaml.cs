@@ -66,6 +66,12 @@ namespace Sedna
 
 
         /// <summary>
+        /// The tab control with all of the image tabs and the viewfinder
+        /// </summary>
+        private readonly TabControl ImageTabControl;
+
+
+        /// <summary>
         /// A logger for capturing status and debug messages
         /// </summary>
         private readonly Logger Logger;
@@ -104,6 +110,7 @@ namespace Sedna
             ButtonSpinner exposureSpinner = this.FindControl<ButtonSpinner>("ExposureBox");
             ExposureBox = new ButtonSpinnerSelectionHandler(exposureSpinner);
             ExposureBox.SelectionChanged += ExposureBox_SelectionChanged;
+            ImageTabControl = this.FindControl<TabControl>("ImageTabControl");
 
             // Set up the viewfinder
             ViewfinderBitmap = new WriteableBitmap(new PixelSize(1920, 1080), new Vector(96, 96), PixelFormat.Bgra8888);
@@ -113,6 +120,8 @@ namespace Sedna
             {
                 CameraManager = new CameraManager(Logger);
             }
+
+            RefreshCameras();
         }
 
 
@@ -131,7 +140,7 @@ namespace Sedna
         /// <param name="e">Not used</param>
         protected override void OnClosed(EventArgs e)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if(CameraManager != null)
             {
                 CameraManager.Dispose();
             }
@@ -141,7 +150,7 @@ namespace Sedna
         /// <summary>
         /// Refreshes the catalog of connected cameras.
         /// </summary>
-        public void RefreshCameras(object Sender, RoutedEventArgs Args)
+        private void RefreshCameras()
         {
             try
             {
@@ -177,7 +186,7 @@ namespace Sedna
             }
             catch(Exception ex)
             {
-                Logger.Error($"Error refreshing cameras: {ex.Message}");
+                Logger.Error($"Error refreshing cameras: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
             }
             finally
             {
@@ -198,8 +207,15 @@ namespace Sedna
                 return;
             }
 
-            string setting = (string)IsoBox.SelectedItem;
-            CameraManager.SetIso(setting);
+            try
+            {
+                string setting = (string)IsoBox.SelectedItem;
+                CameraManager.SetIso(setting);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error setting ISO: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            }
         }
 
 
@@ -215,19 +231,101 @@ namespace Sedna
                 return;
             }
 
-            CameraManager.SetExposure(NewSetting);
+            try
+            {
+                CameraManager.SetExposure(NewSetting);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error setting exposure: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            }
         }
 
 
 
         /// <summary>
-        /// NYI
+        /// Captures an image from the camera.
         /// </summary>
-        /// <param name="Sender"></param>
-        /// <param name="Args"></param>
+        /// <param name="Sender">Not used</param>
+        /// <param name="Args">Not used</param>
         public void CaptureButton_Click(object Sender, RoutedEventArgs Args)
         {
+            if(CameraManager == null)
+            {
+                return;
+            }
 
+            try
+            {
+                (Bitmap imageData, string filename) = CameraManager.CaptureImage();
+
+                // Create the close button for the tab that will hold this image
+                MenuItem closeItem = new MenuItem()
+                {
+                    Header = "_Close"
+                };
+                closeItem.Click += CloseImageTab;
+
+                // Create the new tab for the image
+                TabItem imageTab = new TabItem()
+                {
+                    ContextMenu = new ContextMenu
+                    {
+                        Items = new MenuItem[] { closeItem }
+                    },
+                    Header = filename,
+                    Content = new Image()
+                    {
+                        Source = imageData
+                    }
+                };
+
+                // Add it to the list of tabs and set it as the active one
+                List<TabItem> tabs = new List<TabItem>();
+                foreach(TabItem tab in ImageTabControl.Items)
+                {
+                    tabs.Add(tab);
+                }
+                tabs.Add(imageTab);
+                ImageTabControl.Items = tabs;
+                ImageTabControl.SelectedIndex = tabs.Count - 1;
+            }
+            catch(Exception ex)
+            {
+                Logger.Error($"Error capturing image: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+            }
+        }
+
+
+        /// <summary>
+        /// Closes an image tab when the user clicks the Close button from its context menu.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CloseImageTab(object sender, RoutedEventArgs e)
+        {
+            MenuItem contextMenu = (MenuItem)sender;
+
+            // Traverse the tree until we get to the TabItem
+            IControl parent = contextMenu.Parent;
+            TabItem closingTab;
+            while(!(parent is TabItem) && parent != null)
+            {
+                parent = parent.Parent;
+            }
+            closingTab = (TabItem)parent;
+
+            // Make a new list that doesn't include the closing tab
+            List<TabItem> tabItems = new List<TabItem>();
+            foreach(TabItem existingTab in ImageTabControl.Items)
+            {
+                if(existingTab != closingTab)
+                {
+                    tabItems.Add(existingTab);
+                }
+            }
+
+            ImageTabControl.Items = tabItems;
         }
 
 
