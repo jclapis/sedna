@@ -48,6 +48,10 @@
               </ButtonSpinner>
               <TextBlock Height="20"/>
 
+              <TextBlock Text="Image Format:"/>
+              <ComboBox Name="ImageFormatBox" Height="24" SelectionChanged="ImageFormatBox_SelectionChanged"/>
+              <TextBlock Height="20"/>
+
               <Button Name="CaptureButton" Content="Capture!" Click="CaptureButton_Click"/>
               
             </StackPanel>
@@ -56,8 +60,10 @@
 
         <!-- Viewfinder -->
         <TabControl Name="ImageTabControl" Grid.Column="1" TabStripPlacement="Top" Margin="3">
-          <TabItem Header="Viewfinder">
-            <Image Name="ViewfinderImage" />
+          <TabItem Header="Viewfinder" BorderBrush="Black" BorderThickness="1" FontSize="14">
+            <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4">
+              <Image Name="ViewfinderImage" />
+            </Border>
           </TabItem>
         </TabControl>
 

@@ -41,6 +41,12 @@ namespace Sedna
 
 
         /// <summary>
+        /// The title of the image format setting
+        /// </summary>
+        private const string ImageFormatTitle = "Image Format";
+
+
+        /// <summary>
         /// The context for GPhoto2
         /// </summary>
         private readonly Context Context;
@@ -165,6 +171,31 @@ namespace Sedna
             CameraConfiguration config = ActiveCamera.Configuration;
             SelectionSetting setting = FindSetting<SelectionSetting>(ExposureTitle, config);
             setting.Value = Exposure;
+            ActiveCamera.UpdateConfiguration();
+        }
+
+
+        /// <summary>
+        /// Gets the list of image format settings the camera supports, along with the current setting.
+        /// </summary>
+        /// <returns>The camera's supported image format settings and the current one</returns>
+        public (IReadOnlyList<string> Options, string Current) GetImageFormatSettings()
+        {
+            CameraConfiguration config = ActiveCamera.Configuration;
+            SelectionSetting setting = FindSetting<SelectionSetting>(ImageFormatTitle, config);
+            return (setting.Options, setting.Value);
+        }
+
+
+        /// <summary>
+        /// Sets the image format setting on the camera.
+        /// </summary>
+        /// <param name="ImageFormat">The new exposure setting</param>
+        public void SetImageFormat(string ImageFormat)
+        {
+            CameraConfiguration config = ActiveCamera.Configuration;
+            SelectionSetting setting = FindSetting<SelectionSetting>(ImageFormatTitle, config);
+            setting.Value = ImageFormat;
             ActiveCamera.UpdateConfiguration();
         }
 

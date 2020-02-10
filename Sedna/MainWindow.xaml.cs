@@ -18,11 +18,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using GPhoto2.Net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -63,6 +65,12 @@ namespace Sedna
         /// The manager for the exposure setting box
         /// </summary>
         private readonly ButtonSpinnerSelectionHandler ExposureBox;
+
+
+        /// <summary>
+        /// The image format setting combobox
+        /// </summary>
+        private readonly ComboBox ImageFormatBox;
 
 
         /// <summary>
@@ -111,6 +119,7 @@ namespace Sedna
             ExposureBox = new ButtonSpinnerSelectionHandler(exposureSpinner);
             ExposureBox.SelectionChanged += ExposureBox_SelectionChanged;
             ImageTabControl = this.FindControl<TabControl>("ImageTabControl");
+            ImageFormatBox = this.FindControl<ComboBox>("ImageFormatBox");
 
             // Set up the viewfinder
             ViewfinderBitmap = new WriteableBitmap(new PixelSize(1920, 1080), new Vector(96, 96), PixelFormat.Bgra8888);
@@ -182,11 +191,16 @@ namespace Sedna
                     (IReadOnlyList<string> exposureOptions, string exposure) = CameraManager.GetExposureSettings();
                     ExposureBox.Items = exposureOptions;
                     ExposureBox.SelectedItem = exposure;
+
+                    // Get the image format settings
+                    (IReadOnlyList<string> imageFormatOptions, string imageFormat) = CameraManager.GetImageFormatSettings();
+                    ImageFormatBox.Items = imageFormatOptions;
+                    ImageFormatBox.SelectedItem = imageFormat;
                 }
             }
             catch(Exception ex)
             {
-                Logger.Error($"Error refreshing cameras: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                Logger.Error($"Error refreshing cameras: {ex.GetDetails()}");
             }
             finally
             {
@@ -214,7 +228,7 @@ namespace Sedna
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error setting ISO: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                Logger.Error($"Error setting ISO: {ex.GetDetails()}");
             }
         }
 
@@ -237,10 +251,33 @@ namespace Sedna
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error setting exposure: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                Logger.Error($"Error setting exposure: {ex.GetDetails()}");
             }
         }
 
+
+        /// <summary>
+        /// Updates the camera when the user changes the image format setting.
+        /// </summary>
+        /// <param name="sender">Not used</param>
+        /// <param name="e">Not used</param>
+        public void ImageFormatBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RefreshingCameras)
+            {
+                return;
+            }
+
+            try
+            {
+                string setting = (string)ImageFormatBox.SelectedItem;
+                CameraManager.SetImageFormat(setting);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error setting image format: {ex.GetDetails()}");
+            }
+        }
 
 
         /// <summary>
@@ -255,9 +292,13 @@ namespace Sedna
                 return;
             }
 
+            Bitmap imageData;
+            string filename;
+
+            // Get the image from the camera and create the UI components for it
             try
             {
-                (Bitmap imageData, string filename) = CameraManager.CaptureImage();
+                (imageData, filename) = CameraManager.CaptureImage();
 
                 // Create the close button for the tab that will hold this image
                 MenuItem closeItem = new MenuItem()
@@ -274,9 +315,18 @@ namespace Sedna
                         Items = new MenuItem[] { closeItem }
                     },
                     Header = filename,
-                    Content = new Image()
+                    BorderBrush = Brushes.Black,
+                    BorderThickness = new Thickness(1),
+                    FontSize = 14,
+                    Content = new Border
                     {
-                        Source = imageData
+                        BorderBrush = Brushes.Black,
+                        BorderThickness = new Thickness(1),
+                        CornerRadius = new CornerRadius(4),
+                        Child = new Image()
+                        {
+                            Source = imageData
+                        }
                     }
                 };
 
@@ -292,7 +342,20 @@ namespace Sedna
             }
             catch(Exception ex)
             {
-                Logger.Error($"Error capturing image: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                Logger.Error($"Error capturing image: {ex.GetDetails()}");
+                return;
+            }
+
+            // Save the image out to a file
+            try
+            {
+                string dirName = DateTime.Now.ToString("MM-dd-yy");
+                Directory.CreateDirectory(Path.Combine("Images", dirName));
+                imageData.Save(Path.Combine("Images", dirName, filename));
+            }
+            catch(Exception ex)
+            {
+                Logger.Error($"Error saving image {filename} to file: {ex.GetDetails()}");
             }
         }
 

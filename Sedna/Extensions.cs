@@ -16,6 +16,8 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using System;
+using System.Text;
 
 namespace Sedna
 {
@@ -32,6 +34,30 @@ namespace Sedna
         public static void ScrollToEnd(this ScrollViewer ScrollViewer)
         {
             ScrollViewer.Offset = new Vector(double.NegativeInfinity, double.PositiveInfinity);
+        }
+
+
+        /// <summary>
+        /// Gets the message and stack trace for an exception and all of its inner exceptions.
+        /// </summary>
+        /// <param name="Ex">The exception to get the details for</param>
+        /// <returns>The details of the exception</returns>
+        public static string GetDetails(this Exception Ex)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(Ex.Message);
+            builder.AppendLine(Ex.StackTrace);
+
+            Exception inner = Ex.InnerException;
+            while(inner != null)
+            {
+                builder.AppendLine("Inner:");
+                builder.AppendLine(inner.Message);
+                builder.AppendLine(inner.StackTrace);
+                inner = inner.InnerException;
+            }
+
+            return builder.ToString();
         }
 
     }
