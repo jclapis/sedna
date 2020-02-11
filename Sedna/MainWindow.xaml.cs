@@ -74,6 +74,18 @@ namespace Sedna
 
 
         /// <summary>
+        /// The camera output setting combobox
+        /// </summary>
+        private readonly ComboBox CameraOutputBox;
+
+
+        /// <summary>
+        /// The capture toggle checkbnox
+        /// </summary>
+        private readonly CheckBox CaptureToggle;
+
+
+        /// <summary>
         /// The tab control with all of the image tabs and the viewfinder
         /// </summary>
         private readonly TabControl ImageTabControl;
@@ -92,9 +104,27 @@ namespace Sedna
 
 
         /// <summary>
+        /// The slider for the live view speed
+        /// </summary>
+        private readonly Slider ViewfinderSpeedSlider;
+
+
+        /// <summary>
         /// An internal flag used to disable setting setters during a camera refresh
         /// </summary>
         private bool RefreshingCameras;
+
+
+        /// <summary>
+        /// True when the viewfinder is enabled.
+        /// </summary>
+        private bool IsLiveViewActive;
+
+
+        /// <summary>
+        /// The number of milliseconds to wait between refreshing the live view.
+        /// </summary>
+        private int LiveViewDelay;
 
 
         /// <summary>
@@ -120,6 +150,9 @@ namespace Sedna
             ExposureBox.SelectionChanged += ExposureBox_SelectionChanged;
             ImageTabControl = this.FindControl<TabControl>("ImageTabControl");
             ImageFormatBox = this.FindControl<ComboBox>("ImageFormatBox");
+            CameraOutputBox = this.FindControl<ComboBox>("CameraOutputBox");
+            CaptureToggle = this.FindControl<CheckBox>("CaptureToggle");
+            ViewfinderSpeedSlider = this.FindControl<Slider>("ViewfinderSpeedSlider");
 
             // Set up the viewfinder
             ViewfinderBitmap = new WriteableBitmap(new PixelSize(1920, 1080), new Vector(96, 96), PixelFormat.Bgra8888);
@@ -196,6 +229,11 @@ namespace Sedna
                     (IReadOnlyList<string> imageFormatOptions, string imageFormat) = CameraManager.GetImageFormatSettings();
                     ImageFormatBox.Items = imageFormatOptions;
                     ImageFormatBox.SelectedItem = imageFormat;
+
+                    // Get the camera output settings
+                    (IReadOnlyList<string> cameraOutputOptions, string cameraOutput) = CameraManager.GetCameraOutputSettings();
+                    CameraOutputBox.Items = cameraOutputOptions;
+                    CameraOutputBox.SelectedItem = cameraOutput;
                 }
             }
             catch(Exception ex)
@@ -278,6 +316,32 @@ namespace Sedna
                 Logger.Error($"Error setting image format: {ex.GetDetails()}");
             }
         }
+
+
+        /// <summary>
+        /// Updates the camera when the user changes the camera output setting.
+        /// </summary>
+        /// <param name="sender">Not used</param>
+        /// <param name="e">Not used</param>
+        public void CameraOutputBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RefreshingCameras)
+            {
+                return;
+            }
+
+            try
+            {
+                string setting = (string)CameraOutputBox.SelectedItem;
+                CameraManager.SetCameraOutput(setting);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error setting camera output: {ex.GetDetails()}");
+            }
+        }
+
+
 
 
         /// <summary>
@@ -396,13 +460,21 @@ namespace Sedna
         /// Updates the viewfinder image with new image data.
         /// </summary>
         /// <param name="NewData">The new data to show in the viewfinder</param>
-        private void UpdateViewfinder(byte[] NewData)
+        private void UpdateViewfinder()
         {
-            using (ILockedFramebuffer buffer = ViewfinderBitmap.Lock())
+            while(IsLiveViewActive)
             {
-                Marshal.Copy(NewData, 0, buffer.Address, NewData.Length);
+                try
+                {
+                    ViewfinderImage.Source = CameraManager.Preview();
+                    Thread.Sleep(LiveViewDelay);
+                }
+                catch(Exception ex)
+                {
+                    Logger.Error($"Error updating live view: {ex.GetDetails()}");
+                }
+
             }
-            ViewfinderImage.InvalidateVisual();
         }
 
     }

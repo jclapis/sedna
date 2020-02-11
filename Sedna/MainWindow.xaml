@@ -52,6 +52,14 @@
               <ComboBox Name="ImageFormatBox" Height="24" SelectionChanged="ImageFormatBox_SelectionChanged"/>
               <TextBlock Height="20"/>
 
+              <TextBlock Text="Live View Mode:"/>
+              <ComboBox Name="CameraOutputBox" Height="24" SelectionChanged="CameraOutputBox_SelectionChanged"/>
+              <TextBlock Height="20"/>
+
+              <TextBlock Name="ViewfinderSpeedBox" Text="Viewfinder FPS: 20"/>
+              <Slider Name="ViewfinderSpeedSlider" Height="24" Minimum="0" Maximum="60" TickFrequency="5" Value="20"/>
+              <TextBlock Height="20"/>
+
               <Button Name="CaptureButton" Content="Capture!" Click="CaptureButton_Click"/>
               
             </StackPanel>
@@ -95,9 +103,11 @@
       <!-- Log Box -->
       <Grid Grid.Row="3" Margin="5" RowDefinitions="Auto,*">
         <TextBlock Grid.Row="0" Text="Log:"/>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1" Margin="0,2,0,0">
-          <TextBox Name="LogBox" IsReadOnly="True"/>
-        </ScrollViewer>
+        <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="0,2,0,0">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <TextBox Name="LogBox" IsReadOnly="True"/>
+          </ScrollViewer>
+        </Border>
       </Grid>
       
     </Grid>

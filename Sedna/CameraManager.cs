@@ -16,6 +16,7 @@
 
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using GPhoto2.Net;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,12 @@ namespace Sedna
         /// The title of the image format setting
         /// </summary>
         private const string ImageFormatTitle = "Image Format";
+
+
+        /// <summary>
+        /// The title of the camera output setting
+        /// </summary>
+        private const string CameraOutputTitle = "Camera Output";
 
 
         /// <summary>
@@ -78,6 +85,48 @@ namespace Sedna
         {
             this.Logger = Logger;
             Context = new Context();
+            Context.StatusNotification += Context_StatusNotification;
+            Context.ProgressStarted += Context_ProgressStarted;
+            Context.ProgressUpdated += Context_ProgressUpdated;
+            Context.ProgressStopped += Context_ProgressStopped;
+            Context.MessageReceived += Context_MessageReceived;
+            Context.IdleNotification += Context_IdleNotification;
+            Context.ErrorOccurred += Context_ErrorOccurred;
+        }
+
+        private void Context_ErrorOccurred(object sender, string e)
+        {
+            Logger.Error($"Camera sent an error: {e}");
+        }
+
+        private void Context_IdleNotification(object sender, EventArgs e)
+        {
+            Logger.Info($"GPhoto2 is now idle.");
+        }
+
+        private void Context_MessageReceived(object sender, string e)
+        {
+            Logger.Info($"New message: {e}");
+        }
+
+        private void Context_ProgressStopped(object sender, uint e)
+        {
+            Logger.Info($"Op {e} complete!");
+        }
+
+        private void Context_ProgressUpdated(object sender, ProgressUpdateArgs e)
+        {
+            Logger.Info($"Progress updated for op {e.ProgressID}: {e.Progress.ToString("P2")}");
+        }
+
+        private void Context_ProgressStarted(object sender, ProgressStartArgs e)
+        {
+            Logger.Info($"Progress started for op {e.ProgressID}: {e.Message}");
+        }
+
+        private void Context_StatusNotification(object sender, string e)
+        {
+            Logger.Info($"New status message: {e}");
         }
 
 
@@ -190,12 +239,37 @@ namespace Sedna
         /// <summary>
         /// Sets the image format setting on the camera.
         /// </summary>
-        /// <param name="ImageFormat">The new exposure setting</param>
+        /// <param name="ImageFormat">The new image format setting</param>
         public void SetImageFormat(string ImageFormat)
         {
             CameraConfiguration config = ActiveCamera.Configuration;
             SelectionSetting setting = FindSetting<SelectionSetting>(ImageFormatTitle, config);
             setting.Value = ImageFormat;
+            ActiveCamera.UpdateConfiguration();
+        }
+
+
+        /// <summary>
+        /// Gets the list of camera output settings the camera supports, along with the current setting.
+        /// </summary>
+        /// <returns>The camera's supported camera output settings and the current one</returns>
+        public (IReadOnlyList<string> Options, string Current) GetCameraOutputSettings()
+        {
+            CameraConfiguration config = ActiveCamera.Configuration;
+            SelectionSetting setting = FindSetting<SelectionSetting>(CameraOutputTitle, config);
+            return (setting.Options, setting.Value);
+        }
+
+
+        /// <summary>
+        /// Sets the camera output setting on the camera.
+        /// </summary>
+        /// <param name="CameraOutput">The new camera output setting</param>
+        public void SetCameraOutput(string CameraOutput)
+        {
+            CameraConfiguration config = ActiveCamera.Configuration;
+            SelectionSetting setting = FindSetting<SelectionSetting>(CameraOutputTitle, config);
+            setting.Value = CameraOutput;
             ActiveCamera.UpdateConfiguration();
         }
 
@@ -213,6 +287,20 @@ namespace Sedna
                 Bitmap bitmap = new Bitmap(stream);
                 return (bitmap, file.Name);
             }
+        }
+
+
+        /// <summary>
+        /// Captures a preview image from the active camera.
+        /// </summary>
+        /// <returns>A preview image from the camera</returns>
+        unsafe public Bitmap Preview()
+        {
+            CameraFile preview = ActiveCamera.Preview();
+            (IntPtr previewBuffer, int size) = preview.GetBuffer();
+            UnmanagedMemoryStream stream = new UnmanagedMemoryStream((byte*)previewBuffer.ToPointer(), size);
+            Bitmap bitmap = new Bitmap(stream);
+            return bitmap;
         }
 
 
