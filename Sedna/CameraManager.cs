@@ -278,12 +278,12 @@ namespace Sedna
         /// Captures an image from the active camera.
         /// </summary>
         /// <returns>The image's data and its name</returns>
-        public (Bitmap ImageSource, string Filename) CaptureImage()
+        unsafe public (Bitmap ImageSource, string Filename) CaptureImage()
         {
-            CameraFile file = ActiveCamera.Capture(CameraCaptureType.Image);
-
-            using(MemoryStream stream = new MemoryStream(file.Data))
+            using (CameraFile file = ActiveCamera.Capture(CameraCaptureType.Image))
+            using (UnmanagedMemoryStream stream = new UnmanagedMemoryStream((byte*)file.Data.ToPointer(), (long)file.Size))
             {
+                Logger.Debug($"Image MIME: {file.MimeType}");
                 Bitmap bitmap = new Bitmap(stream);
                 return (bitmap, file.Name);
             }
@@ -296,11 +296,13 @@ namespace Sedna
         /// <returns>A preview image from the camera</returns>
         unsafe public Bitmap Preview()
         {
-            CameraFile preview = ActiveCamera.Preview();
-            (IntPtr previewBuffer, int size) = preview.GetBuffer();
-            UnmanagedMemoryStream stream = new UnmanagedMemoryStream((byte*)previewBuffer.ToPointer(), size);
-            Bitmap bitmap = new Bitmap(stream);
-            return bitmap;
+            using (CameraFile preview = ActiveCamera.Preview())
+            using (UnmanagedMemoryStream stream = new UnmanagedMemoryStream((byte*)preview.Data.ToPointer(), (long)preview.Size))
+            {
+                Logger.Debug($"Preview MIME: {preview.MimeType}");
+                Bitmap bitmap = new Bitmap(stream);
+                return bitmap;
+            }
         }
 
 

@@ -21,6 +21,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using GPhoto2.Net;
 using System;
 using System.Collections.Generic;
@@ -110,6 +111,12 @@ namespace Sedna
 
 
         /// <summary>
+        /// The label for the live view speed
+        /// </summary>
+        private readonly TextBlock ViewfinderSpeedLabel;
+
+
+        /// <summary>
         /// An internal flag used to disable setting setters during a camera refresh
         /// </summary>
         private bool RefreshingCameras;
@@ -125,6 +132,9 @@ namespace Sedna
         /// The number of milliseconds to wait between refreshing the live view.
         /// </summary>
         private int LiveViewDelay;
+
+
+        private Task LiveViewTask;
 
 
         /// <summary>
@@ -153,10 +163,14 @@ namespace Sedna
             CameraOutputBox = this.FindControl<ComboBox>("CameraOutputBox");
             CaptureToggle = this.FindControl<CheckBox>("CaptureToggle");
             ViewfinderSpeedSlider = this.FindControl<Slider>("ViewfinderSpeedSlider");
+            ViewfinderSpeedLabel = this.FindControl<TextBlock>("ViewfinderSpeedLabel");
 
             // Set up the viewfinder
             ViewfinderBitmap = new WriteableBitmap(new PixelSize(1920, 1080), new Vector(96, 96), PixelFormat.Bgra8888);
             ViewfinderImage.Source = ViewfinderBitmap;
+
+            // Misc other setup
+            LiveViewDelay = 50;
 
             if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
@@ -334,14 +348,29 @@ namespace Sedna
             {
                 string setting = (string)CameraOutputBox.SelectedItem;
                 CameraManager.SetCameraOutput(setting);
+                if(setting.Contains("PC"))
+                {
+                    if(!IsLiveViewActive)
+                    {
+                        IsLiveViewActive = true;
+                        LiveViewTask = Task.Run(UpdateViewfinder);
+                    }
+                }
+                else
+                {
+                    if(IsLiveViewActive)
+                    {
+                        IsLiveViewActive = false;
+                        LiveViewTask.Wait();
+                        LiveViewTask = null;
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error($"Error setting camera output: {ex.GetDetails()}");
             }
         }
-
-
 
 
         /// <summary>
@@ -466,7 +495,11 @@ namespace Sedna
             {
                 try
                 {
-                    ViewfinderImage.Source = CameraManager.Preview();
+                    Bitmap newPreview = CameraManager.Preview();
+                    Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        ViewfinderImage.Source = newPreview;
+                    });
                     Thread.Sleep(LiveViewDelay);
                 }
                 catch(Exception ex)
@@ -475,6 +508,18 @@ namespace Sedna
                 }
 
             }
+        }
+
+        public void ViewfinderSpeedSlider_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if(e.Property.Name != "Value")
+            {
+                return;
+            }
+
+            int fps = (int)(double)e.NewValue;
+            LiveViewDelay = 1000 / fps;
+            ViewfinderSpeedLabel.Text = $"Viewfinder FPS: {fps}";
         }
 
     }

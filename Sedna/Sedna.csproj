@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.9.3" />
     <PackageReference Include="Avalonia.Desktop" Version="0.9.3" />
-    <PackageReference Include="libgphoto2-sharp" Version="0.0.1-alpha10" />
+    <PackageReference Include="libgphoto2-sharp" Version="0.0.1-alpha12" />
     <PackageReference Include="SkiaSharp" Version="1.68.1.1" />
   </ItemGroup>
 </Project>

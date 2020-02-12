@@ -56,8 +56,8 @@
               <ComboBox Name="CameraOutputBox" Height="24" SelectionChanged="CameraOutputBox_SelectionChanged"/>
               <TextBlock Height="20"/>
 
-              <TextBlock Name="ViewfinderSpeedBox" Text="Viewfinder FPS: 20"/>
-              <Slider Name="ViewfinderSpeedSlider" Height="24" Minimum="0" Maximum="60" TickFrequency="5" Value="20"/>
+              <TextBlock Name="ViewfinderSpeedLabel" Text="Viewfinder FPS: 20"/>
+              <Slider Name="ViewfinderSpeedSlider" Height="24" Minimum="0" Maximum="30" TickFrequency="5" Value="20" PropertyChanged="ViewfinderSpeedSlider_PropertyChanged"/>
               <TextBlock Height="20"/>
 
               <Button Name="CaptureButton" Content="Capture!" Click="CaptureButton_Click"/>
