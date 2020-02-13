@@ -14,13 +14,14 @@
  * limitations under the License.
  * ======================================================================== */
 
-using Avalonia.Controls;
+using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using GPhoto2.Net;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TurboJpegWrapper;
 
 namespace Sedna
 {
@@ -66,6 +67,12 @@ namespace Sedna
 
 
         /// <summary>
+        /// The decoder for quickly decompressing preview JPEG images.
+        /// </summary>
+        private readonly TJDecompressor JpegDecoder;
+
+
+        /// <summary>
         /// The cameras that are connected to the machine
         /// </summary>
         private IReadOnlyList<Camera> Cameras;
@@ -84,6 +91,7 @@ namespace Sedna
         public CameraManager(Logger Logger)
         {
             this.Logger = Logger;
+            JpegDecoder = new TJDecompressor();
             Context = new Context();
             Context.StatusNotification += Context_StatusNotification;
             Context.ProgressStarted += Context_ProgressStarted;
@@ -291,17 +299,32 @@ namespace Sedna
 
 
         /// <summary>
-        /// Captures a preview image from the active camera.
+        /// Creates a writeable bitmap large enough to store the provided JPEG image. This bitmap can be reused
+        /// for new JPEGs of the same size.
         /// </summary>
-        /// <returns>A preview image from the camera</returns>
-        unsafe public Bitmap Preview()
+        /// <returns>A writeable bitmap with the correct dimensions for containing preview images.</returns>
+        public WriteableBitmap CreateWriteableBitmapForPreview()
         {
             using (CameraFile preview = ActiveCamera.Preview())
-            using (UnmanagedMemoryStream stream = new UnmanagedMemoryStream((byte*)preview.Data.ToPointer(), (long)preview.Size))
             {
-                Logger.Debug($"Preview MIME: {preview.MimeType}");
-                Bitmap bitmap = new Bitmap(stream);
+                JpegDecoder.GetImageInfo(preview.Data, preview.Size, TJPixelFormat.BGRA, out int width, out int height, out int stride, out int bufferSize);
+                WriteableBitmap bitmap = new WriteableBitmap(new PixelSize(width, height), new Vector(96, 96), PixelFormat.Bgra8888);
                 return bitmap;
+            }
+        }
+
+
+        /// <summary>
+        /// Updates the preview image with a new preview file from the camera.
+        /// </summary>
+        /// <param name="PreviewBitmap">The bitmap that acts as the image source for the preview display</param>
+        public void UpdatePreview(WriteableBitmap PreviewBitmap)
+        {
+            using (CameraFile preview = ActiveCamera.Preview())
+            using (ILockedFramebuffer bitmapBuffer = PreviewBitmap.Lock())
+            {
+                int bitmapBufferSize = bitmapBuffer.Size.Width * bitmapBuffer.Size.Height * 4;
+                JpegDecoder.Decompress(preview.Data, preview.Size, bitmapBuffer.Address, bitmapBufferSize, TJPixelFormat.BGRA, TJFlags.None, out _, out _, out _);
             }
         }
 
@@ -340,6 +363,7 @@ namespace Sedna
             {
                 if (disposing)
                 {
+                    JpegDecoder.Dispose();
                     ActiveCamera = null;
                     if(Cameras != null)
                     {

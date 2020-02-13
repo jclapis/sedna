@@ -45,12 +45,6 @@ namespace Sedna
 
 
         /// <summary>
-        /// The underlying bitmap source that viewfinder data will be written to for display
-        /// </summary>
-        private readonly WriteableBitmap ViewfinderBitmap;
-
-
-        /// <summary>
         /// The camera selection combobox
         /// </summary>
         private readonly ComboBox CameraSelectionBox;
@@ -117,6 +111,12 @@ namespace Sedna
 
 
         /// <summary>
+        /// The underlying bitmap source that viewfinder data will be written to for display
+        /// </summary>
+        private WriteableBitmap ViewfinderBitmap;
+
+
+        /// <summary>
         /// An internal flag used to disable setting setters during a camera refresh
         /// </summary>
         private bool RefreshingCameras;
@@ -164,11 +164,7 @@ namespace Sedna
             CaptureToggle = this.FindControl<CheckBox>("CaptureToggle");
             ViewfinderSpeedSlider = this.FindControl<Slider>("ViewfinderSpeedSlider");
             ViewfinderSpeedLabel = this.FindControl<TextBlock>("ViewfinderSpeedLabel");
-
-            // Set up the viewfinder
-            ViewfinderBitmap = new WriteableBitmap(new PixelSize(1920, 1080), new Vector(96, 96), PixelFormat.Bgra8888);
-            ViewfinderImage.Source = ViewfinderBitmap;
-
+            
             // Misc other setup
             LiveViewDelay = 50;
 
@@ -347,23 +343,30 @@ namespace Sedna
             try
             {
                 string setting = (string)CameraOutputBox.SelectedItem;
-                CameraManager.SetCameraOutput(setting);
                 if(setting.Contains("PC"))
                 {
-                    if(!IsLiveViewActive)
+                    // Set the output before starting the live view thread
+                    CameraManager.SetCameraOutput(setting);
+                    if (!IsLiveViewActive)
                     {
+                        // Set up the viewfinder image
+                        ViewfinderBitmap = CameraManager.CreateWriteableBitmapForPreview();
+                        ViewfinderImage.Source = ViewfinderBitmap;
+
                         IsLiveViewActive = true;
                         LiveViewTask = Task.Run(UpdateViewfinder);
                     }
                 }
                 else
-                {
-                    if(IsLiveViewActive)
+                { 
+                    // Kill the live view thread before setting the output
+                    if (IsLiveViewActive)
                     {
                         IsLiveViewActive = false;
                         LiveViewTask.Wait();
                         LiveViewTask = null;
                     }
+                    CameraManager.SetCameraOutput(setting);
                 }
             }
             catch (Exception ex)
@@ -495,10 +498,10 @@ namespace Sedna
             {
                 try
                 {
-                    Bitmap newPreview = CameraManager.Preview();
+                    CameraManager.UpdatePreview(ViewfinderBitmap);
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ViewfinderImage.Source = newPreview;
+                        ViewfinderImage.InvalidateVisual();
                     });
                     Thread.Sleep(LiveViewDelay);
                 }
