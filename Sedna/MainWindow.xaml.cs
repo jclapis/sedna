@@ -16,6 +16,7 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
@@ -30,6 +31,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Path = System.IO.Path;
 
 namespace Sedna
 {
@@ -111,6 +114,24 @@ namespace Sedna
 
 
         /// <summary>
+        /// The vertical crosshair bar
+        /// </summary>
+        private readonly Rectangle VerticalCrosshairBar;
+
+
+        /// <summary>
+        /// The horizontal crosshair bar
+        /// </summary>
+        private readonly Rectangle HorizontalCrosshairBar;
+
+
+        /// <summary>
+        /// The crosshair circle
+        /// </summary>
+        private readonly Ellipse CrosshairCircle;
+
+
+        /// <summary>
         /// The underlying bitmap source that viewfinder data will be written to for display
         /// </summary>
         private WriteableBitmap ViewfinderBitmap;
@@ -164,7 +185,10 @@ namespace Sedna
             CaptureToggle = this.FindControl<CheckBox>("CaptureToggle");
             ViewfinderSpeedSlider = this.FindControl<Slider>("ViewfinderSpeedSlider");
             ViewfinderSpeedLabel = this.FindControl<TextBlock>("ViewfinderSpeedLabel");
-            
+            VerticalCrosshairBar = this.FindControl<Rectangle>("VerticalCrosshairBar");
+            HorizontalCrosshairBar = this.FindControl<Rectangle>("HorizontalCrosshairBar");
+            CrosshairCircle = this.FindControl<Ellipse>("CrosshairCircle");
+
             // Misc other setup
             LiveViewDelay = 50;
 
@@ -452,6 +476,29 @@ namespace Sedna
             catch(Exception ex)
             {
                 Logger.Error($"Error saving image {filename} to file: {ex.GetDetails()}");
+            }
+        }
+
+
+        /// <summary>
+        /// Toggles the crosshairs in the viewfinder.
+        /// </summary>
+        /// <param name="sender">Not used</param>
+        /// <param name="e">Not used</param>
+        public void Crosshairs_Checked(object sender, RoutedEventArgs e)
+        {
+            CheckBox crosshairBox = (CheckBox)e.Source;
+            if(crosshairBox.IsChecked == true)
+            {
+                VerticalCrosshairBar.Opacity = 1;
+                HorizontalCrosshairBar.Opacity = 1;
+                CrosshairCircle.Opacity = 1;
+            }
+            else
+            {
+                VerticalCrosshairBar.Opacity = 0;
+                HorizontalCrosshairBar.Opacity = 0;
+                CrosshairCircle.Opacity = 0;
             }
         }
 

@@ -14,7 +14,7 @@
 
       </MenuItem>
     </Menu>
-    
+
     <Grid RowDefinitions="5, *, 5, 180">
 
       <Grid Grid.Row="1" ColumnDefinitions="150, *, 150">
@@ -34,14 +34,14 @@
                 </ComboBox.ItemTemplate>
               </ComboBox>
               <TextBlock Height="5"/>
-              
+
               <Button Name="CameraDetailsButton" Content="Camera Details" IsEnabled="False"/>
               <TextBlock Height="5"/>
 
               <TextBlock Text="ISO:"/>
               <ComboBox Name="IsoBox" Height="24" SelectionChanged="IsoBox_SelectionChanged"/>
               <TextBlock Height="20"/>
-              
+
               <TextBlock Text="Exposure:"/>
               <ButtonSpinner Name="ExposureBox">
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"/>
@@ -61,17 +61,25 @@
               <TextBlock Height="20"/>
 
               <Button Name="CaptureButton" Content="Capture!" Click="CaptureButton_Click"/>
-              
+
             </StackPanel>
           </Border>
         </Grid>
 
-        <!-- Viewfinder -->
+        <!-- Viewfinder and Captured Images -->
         <TabControl Name="ImageTabControl" Grid.Column="1" TabStripPlacement="Top" Margin="3">
           <TabItem Header="Viewfinder" BorderBrush="Black" BorderThickness="1" FontSize="14">
-            <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4">
-              <Image Name="ViewfinderImage" />
-            </Border>
+            <Grid>
+              <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4">
+                <Image Name="ViewfinderImage" />
+              </Border>
+              <Rectangle Name="VerticalCrosshairBar" Fill="Red" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Opacity="0"/>
+              <Rectangle Name="HorizontalCrosshairBar" Fill="Red" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Opacity="0"/>
+              <Ellipse Name="CrosshairCircle" Stroke="Red" StrokeThickness="3" Width="21" Height="21" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0"/>
+              <Border Background="White"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5" CornerRadius="4">
+                <CheckBox Content="Enable Crosshairs" Margin="5" Checked="Crosshairs_Checked" Unchecked="Crosshairs_Checked"/>
+              </Border>
+            </Grid>
           </TabItem>
         </TabControl>
 
@@ -81,21 +89,50 @@
           <Border Grid.Row="1" Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="4">
             <StackPanel Grid.Column="0" Margin="5">
 
-              <Button Name="ToggleMotorButton" Content="Enable Motors"/>
-              <TextBlock Height="20"/>
-              
-              <TextBlock Text="X Deg/Sec:"/>
-              <TextBox Name="MotorXBox"/>
+              <Button Name="ToggleMotorButton" Content="Engage Motors"/>
               <TextBlock Height="20"/>
 
-              <TextBlock Text="Y Deg/Sec:"/>
-              <TextBox Name="MotorYBox"/>
+              <TextBlock Name="FocusLabel" Text="Focus Position: 0"/>
+              <Slider Name="FocusSlider" Height="24" Minimum="0" Maximum="16384" TickFrequency="1" Value="0" />
+              <Grid ColumnDefinitions="*,5,*,5,*,5,*">
+                <Button Name="FastLowerFocus" Grid.Column="0" Content="&lt;&lt;" FontWeight="Bold"/>
+                <Button Name="LowerFocus" Grid.Column="2" Content="&lt;"/>
+                <Button Name="RaiseFocus" Grid.Column="4" Content="&gt;"/>
+                <Button Name="FastRaiseFocus" Grid.Column="6" Content="&gt;&gt;" FontWeight="Bold"/>
+              </Grid>
+              <TextBlock Height="20"/>
+
+              <CheckBox Name="EnableTrackingBox" Content="Enable Tracking"/>
+              <TextBlock Height="20"/>
+
+              <TextBlock Text="Azimuth:"/>
+              <TextBlock Name="AzimuthBox"/>
+              <TextBlock Height="20"/>
+
+              <TextBlock Text="Elevation:"/>
+              <TextBlock Name="ElevationBox"/>
+              <TextBlock Height="20"/>
+
+              <TextBlock Text="Az Speed Multiplier:" TextWrapping="Wrap"/>
+              <TextBox Name="MotorXSpeedBox" Text="1"/>
+              <TextBlock Height="20"/>
+
+              <TextBlock Text="El Speed Multiplier:"/>
+              <TextBox Name="MotorYSpeedBox" Text="1"/>
+              <TextBlock Height="20"/>
+
+              <TextBlock Text="Jump to Azimuth (X):"/>
+              <TextBox Name="AzimuthJumpBox"/>
+              <TextBlock Height="20"/>
+
+              <TextBlock Text="Jump to Elevation (Y):"/>
+              <TextBox Name="ElevationJumpBox"/>
               <TextBlock Height="20"/>
 
             </StackPanel>
           </Border>
         </Grid>
-        
+
       </Grid>
 
       <GridSplitter Grid.Row="2"/>
@@ -109,7 +146,7 @@
           </ScrollViewer>
         </Border>
       </Grid>
-      
+
     </Grid>
   </DockPanel>
 
