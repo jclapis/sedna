@@ -23,7 +23,7 @@
 #include <asm/ioctl.h>
 #include <linux/spi/spidev.h>
 #include <wiringPi.h>
-#include <SednaMotorControl.h>
+#include "SednaMotorControl.h"
 
 
 // =======================
