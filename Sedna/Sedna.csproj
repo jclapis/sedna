@@ -15,10 +15,21 @@
     </AvaloniaResource>
   </ItemGroup>
   <ItemGroup>
+    <AvaloniaResource Remove="CameraSettingsWindow.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="CameraSettingsWindow.xaml" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.9.3" />
     <PackageReference Include="Avalonia.Desktop" Version="0.9.3" />
     <PackageReference Include="libgphoto2-sharp" Version="0.0.1-alpha12" />
     <PackageReference Include="Quamotion.TurboJpegWrapper" Version="1.5.69" />
     <PackageReference Include="SkiaSharp" Version="1.68.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CameraSettingsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

@@ -1,0 +1,44 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Sedna.CameraSettingsWindow"
+        Title="CameraSettingsWindow">
+
+  <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*,Auto">
+    
+    <StackPanel Margin="5" Grid.Column="0" VerticalAlignment="Stretch">
+      <TextBlock Text="Available Settings" HorizontalAlignment="Center"/>
+      <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" VerticalAlignment="Center">
+        <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="3" >
+          <ListBox Height="600">
+            
+          </ListBox>
+        </ScrollViewer>
+      </Border>
+    </StackPanel>
+
+    <StackPanel Margin="5" Grid.Column="1" VerticalAlignment="Stretch">
+      <TextBlock Text="Setting Details" HorizontalAlignment="Center"/>
+      <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" VerticalAlignment="Stretch">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="100,*">
+          <TextBlock Grid.Row="0" Grid.Column="0" Text="Title:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="1" Grid.Column="0" Text="Key:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="2" Grid.Column="0" Text="Type:" HorizontalAlignment="Right" Margin="5"/>
+        </Grid>
+      </Border>
+    </StackPanel>
+    
+    <StackPanel Margin="5" Grid.Column="2" VerticalAlignment="Stretch">
+      <TextBlock Text="Added Settings" HorizontalAlignment="Center"/>
+      <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" VerticalAlignment="Stretch">
+        <Grid>
+
+        </Grid>
+      </Border>
+    </StackPanel>
+    
+  </Grid>
+  
+</Window>
