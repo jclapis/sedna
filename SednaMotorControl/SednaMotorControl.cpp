@@ -25,7 +25,7 @@
 #include <wiringPi.h>
 #include <stdexcept>
 #include "SednaMotorControl.h"
-#include "Spi.h"
+#include "Amt22.h"
 
 using namespace std;
 using namespace Sedna;
@@ -62,31 +62,12 @@ int Initialize()
 }
 
 
-int CreateDevice(SpiDeviceType DeviceType, unsigned char ChipSelectPin, void** Driver)
+int CreateAmt22(unsigned char ChipSelectPin, void** Device)
 {
     try
     {
-        SpiDevice* device;
-        switch (DeviceType)
-        {
-        case SpiDeviceType::SpiDeviceType_L6470:
-            // The L6470 has a speed cap of 5 MHz and all of its timings are in the nanosecond range
-            // so I just set all of the delays to 1 us. The AutoDriver library uses 4 MHz as the SPI
-            // datarate for some reason (probably related to the Arduino's clock itself), but I'm not
-            // in a huge rush for data so 4 MHz is fine.
-            // Datasheet: https://cdn.sparkfun.com/datasheets/Robotics/dSPIN.pdf
-            device = new SpiDevice(ChipSelectPin, 4000000, SpiMode::Mode3, 1, 0, 1, 1);
-            break;
-
-        case SpiDeviceType::SpiDeviceType_Amt22:
-            // The AMT22 series has a speed cap of 2 MHz, but I'll leave it at 1 to be safe. The
-            // timings are in the microsecond range so they actually matter here. The datasheet is
-            // pretty detailed: https://www.mouser.com/datasheet/2/670/amt22-1517358.pdf
-            device = new SpiDevice(ChipSelectPin, 1000000, SpiMode::Mode0, 3, 3, 40, 3);
-            break;
-        }
-
-        *Driver = device;
+        Amt22* device = new Amt22(ChipSelectPin);
+        *Device = device;
         return 0;
     }
     catch (runtime_error& ex)
@@ -96,13 +77,14 @@ int CreateDevice(SpiDeviceType DeviceType, unsigned char ChipSelectPin, void** D
 }
 
 
-int FreeDevice(void* Device)
+void FreeAmt22(void* Device)
 {
-    SpiDevice* spiDevice = static_cast<SpiDevice*>(Device);
-    if (spiDevice != nullptr)
+    Amt22* device = static_cast<Amt22*>(Device);
+    if (device != nullptr)
     {
-        delete spiDevice;
+        delete device;
     }
-
-    return 0;
 }
+
+// TODO: L6470
+// device = new SpiDevice(ChipSelectPin, 4000000, SpiMode::Mode3, 1, 0, 1, 1);

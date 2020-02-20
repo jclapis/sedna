@@ -79,7 +79,7 @@ SpiDevice::SpiDevice(
 }
 
 
-int SpiDevice::TransferData(unsigned char* Buffer, size_t BufferSize)
+void SpiDevice::TransferData(unsigned char* Buffer, size_t BufferSize)
 {
     // Set up the SPI transfer structure
     __u64 bufferAsLong = reinterpret_cast<__u64>(Buffer);
@@ -117,6 +117,4 @@ int SpiDevice::TransferData(unsigned char* Buffer, size_t BufferSize)
 
     // Wait for the device to be ready to use again
     delayMicroseconds(TimeBetweenReads);
-
-    return 0;
 }

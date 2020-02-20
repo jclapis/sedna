@@ -16,11 +16,8 @@
 
 #pragma once
 
-#ifdef __cplusplus
 extern "C"
 {
-#endif
-
     /// <summary>
     /// Defines the type of a SPI device.
     /// </summary>
@@ -52,14 +49,22 @@ extern "C"
     const char* GetLastError();
 
 
-    int CreateDevice(SpiDeviceType DeviceType, unsigned char ChipSelectPin, void** Driver);
+    /// <summary>
+    /// Creates a handle to an AMT22 rotary encoder.
+    /// </summary>
+    /// <param name="ChipSelectPin">The number of the chip select pin for this device.
+    /// This uses the WiringPi pin layout. To find what the pin number is for a given
+    /// physical pin, run `gpio readall` on your Pi.</param>
+    /// <param name="Device">[OUT] A handle to the new device.</param>
+    /// <returns>0 if this was successful, -1 if an error occurred. Use GetLastError() to
+    /// see what went wrong.</returns>
+    int CreateAmt22(unsigned char ChipSelectPin, void** Device);
 
-    int FreeDevice(void* Device);
 
+    /// <summary>
+    /// Frees an AMT22 device.
+    /// </summary>
+    /// <param name="Device">The handle of the device to free.</param>
+    void FreeAmt22(void* Device);
 
-
-
-
-#ifdef __cplusplus
 }
-#endif

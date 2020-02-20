@@ -70,12 +70,12 @@ namespace Sedna
 		/// it can be selected again for a subsequent read/write.</param>
 		SpiDevice(
 			unsigned char ChipSelectPin,
-			unsigned int BitRate = 1000000,
-			SpiMode SpiMode = SpiMode::Mode0,
-			unsigned char TimeBeforeRead = 0,
-			unsigned char TimeBetweenBytes = 0,
-			unsigned char TimeAfterRead = 0,
-			unsigned char TimeBetweenReads = 0
+			unsigned int BitRate,
+			SpiMode SpiMode,
+			unsigned char TimeBeforeRead,
+			unsigned char TimeBetweenBytes,
+			unsigned char TimeAfterRead,
+			unsigned char TimeBetweenReads
 		);
 
 
@@ -85,8 +85,7 @@ namespace Sedna
 		/// <param name="Buffer">The buffer containing the data to write. After the transfer, this will contain
 		/// the data read from the device.</param>
 		/// <param name="BufferSize">The size of the buffer, in bytes.</param>
-		/// <returns>0 if successful, -1 if something went wrong.</returns>
-		int TransferData(unsigned char* Buffer, size_t BufferSize);
+		void TransferData(unsigned char* Buffer, size_t BufferSize);
 
 
 	private:

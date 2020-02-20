@@ -76,6 +76,7 @@
     </RemotePostBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CppLanguageStandard>c++17</CppLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -88,14 +89,17 @@
     </RemotePostBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CppLanguageStandard>c++17</CppLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Amt22.cpp" />
     <ClCompile Include="SednaMotorControl.cpp" />
     <ClCompile Include="SparkFunAutoDriver.cpp" />
     <ClCompile Include="Spi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Amt22.h" />
     <ClInclude Include="SednaMotorControl.h" />
     <ClInclude Include="SparkFunAutoDriver.h" />
     <ClInclude Include="SparkFundSPINConstants.h" />
@@ -107,6 +111,7 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CppLanguageStandard>c++17</CppLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -115,6 +120,7 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CppLanguageStandard>c++17</CppLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
