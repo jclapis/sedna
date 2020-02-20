@@ -24,33 +24,27 @@
 #include <math.h>
 #include "SparkFunAutoDriver.h"
 
+using namespace Sedna;
 
 int AutoDriver::_numBoards = 0;
 
 // Constructors
-AutoDriver::AutoDriver(int position, int CSPin, int resetPin, int busyPin)
+AutoDriver::AutoDriver(SpiDevice* SpiDevice, int position, int CSPin, int resetPin, int busyPin)
 {
     _CSPin = CSPin;
     _position = position;
     _resetPin = resetPin;
     _busyPin = busyPin;
     _numBoards++;
-    _SPI = &SPI;
+
+
+    _SPI = SpiDevice;
 }
 
-AutoDriver::AutoDriver(int position, int CSPin, int resetPin)
+AutoDriver::AutoDriver(SpiDevice* SpiDevice, int position, int CSPin, int resetPin)
+    : AutoDriver(SpiDevice, position, CSPin, resetPin, -1)
 {
-    _CSPin = CSPin;
-    _position = position;
-    _resetPin = resetPin;
-    _busyPin = -1;
-    _numBoards++;
-    _SPI = &SPI;
-}
 
-void AutoDriver::SPIPortConnect(SPIClass* SPIPort)
-{
-    _SPI = SPIPort;
 }
 
 int AutoDriver::busyCheck(void)
@@ -921,17 +915,5 @@ long AutoDriver::xferParam(unsigned long value, unsigned char bitLen)
 
 unsigned char AutoDriver::SPIXfer(unsigned char data)
 {
-    unsigned char dataPacket[_numBoards];
-    int i;
-    for (i = 0; i < _numBoards; i++)
-    {
-        dataPacket[i] = 0;
-    }
-    dataPacket[_position] = data;
-    digitalWrite(_CSPin, LOW);
-    _SPI->beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE3));
-    _SPI->transfer(dataPacket, _numBoards);
-    _SPI->endTransaction();
-    digitalWrite(_CSPin, HIGH);
-    return dataPacket[_position];
+    _SPI->TransferData(&data, 1);
 }

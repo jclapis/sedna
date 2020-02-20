@@ -17,61 +17,32 @@
 #pragma once
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
     /// <summary>
-    /// This represents the settings for a specific device on the SPI bus.
+    /// Defines the type of a SPI device.
     /// </summary>
-    struct SpiDevice
+    enum SpiDeviceType
     {
         /// <summary>
-        /// The number of the chip select pin for this device. This uses the
-        /// WiringPi pin layout. To find what the pin number is for a given
-        /// physical pin, run `gpio readall` on your Pi.
+        /// An L6470 autodriver 
         /// </summary>
-        unsigned char ChipSelectPin;
-
+        SpiDeviceType_L6470 = 0,
 
         /// <summary>
-        /// The speed of the SPI communications for this device, in Hz.
+        /// An AMT22 rotary encoder
         /// </summary>
-        unsigned int BitRate;
-
-
-        /// <summary>
-        /// The SPI mode that this device uses
-        /// </summary>
-        unsigned char SpiMode;
-
-
-        /// <summary>
-        /// The delay (in microseconds) between pulling the chip select pin low and
-        /// starting to read/write data from/to the device.
-        /// </summary>
-        unsigned char TimeBeforeRead;
-
-
-        /// <summary>
-        /// The delay (in microseconds) to wait between reading and writing individual bytes.
-        /// Some devices have specific timings for this; consult your device's datasheet.
-        /// </summary>
-        unsigned char TimeBetweenBytes;
-
-
-        /// <summary>
-        /// The delay (in microseconds) to wait after finishing a data read/write before setting
-        /// the chip select pin back to high (unselecting the device).
-        /// </summary>
-        unsigned char TimeAfterRead;
-
-
-        /// <summary>
-        /// The delay (in microseconds) to wait after unselecting a device before it can be 
-        /// selected again for a subsequent read/write.
-        /// </summary>
-        unsigned char TimeBetweenReads;
+        SpiDeviceType_Amt22 = 1
     };
+
+
+    /// <summary>
+    /// Initializes the motor control system. This must be called before anything else.
+    /// </summary>
+    /// <returns>0 if successful, -1 if an error occurred.</returns>
+    int Initialize();
 
 
     /// <summary>
@@ -81,17 +52,11 @@ extern "C" {
     const char* GetLastError();
 
 
-    /// <summary>
-    /// Initializes the motor control system.
-    /// </summary>
-    /// <returns>0 if successful, -1 if an error occurred.</returns>
-    int Initialize();
+    int CreateDevice(SpiDeviceType DeviceType, unsigned char ChipSelectPin, void** Driver);
+
+    int FreeDevice(void* Device);
 
 
-    /// <summary>
-    /// Initializes a SPI device so it can be used.
-    /// </summary>
-    void InitializeSpiDevice(SpiDevice* Device);
 
 
 

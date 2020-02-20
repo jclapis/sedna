@@ -14,145 +14,145 @@
  * limitations under the License.
  * ======================================================================== */
 
+ // This file is derived from SparkFun's L6470 Autodriver library. Please see
+ // the original source for more information:
+ // https://github.com/sparkfun/L6470-AutoDriver/tree/master/Libraries/Arduino/src
+
+
 #pragma once
 
-// This file is derived from SparkFun's L6470 Autodriver library. Please see
-// the original source for more information:
-// https://github.com/sparkfun/L6470-AutoDriver/tree/master/Libraries/Arduino/src
-
-
-
 #include "SparkFundSPINConstants.h"
+#include "Spi.h"
 
-class AutoDriver
+namespace Sedna
 {
-public:
-    // Constructors. We'll ALWAYS want a CS pin and a reset pin, but we may
-    //  not want a busy pin. By using two constructors, we make it easy to
-    //  allow that.
-    AutoDriver(int position, int CSPin, int resetPin, int busyPin);
-    AutoDriver(int position, int CSPin, int resetPin);
+	class AutoDriver
+	{
+	public:
+		// Constructors. We'll ALWAYS want a CS pin and a reset pin, but we may
+		//  not want a busy pin. By using two constructors, we make it easy to
+		//  allow that.
+		AutoDriver(SpiDevice* SpiDevice, int position, int CSPin, int resetPin, int busyPin);
+		AutoDriver(SpiDevice* SpiDevice, int position, int CSPin, int resetPin);
 
-    void SPIPortConnect(SPIClass* SPIPort);
+		// These are super-common things to do: checking if the device is busy,
+		//  and checking the status of the device. We make a couple of functions
+		//  for that.
+		int busyCheck();
+		int getStatus();
 
-    // These are super-common things to do: checking if the device is busy,
-    //  and checking the status of the device. We make a couple of functions
-    //  for that.
-    int busyCheck();
-    int getStatus();
+		// Some users will want to do things other than what we explicitly provide
+		//  nice functions for; give them unrestricted access to the parameter
+		//  registers.
+		void setParam(unsigned char param, unsigned long value);
+		long getParam(unsigned char param);
 
-    // Some users will want to do things other than what we explicitly provide
-    //  nice functions for; give them unrestricted access to the parameter
-    //  registers.
-    void setParam(unsigned char param, unsigned long value);
-    long getParam(unsigned char param);
+		// Lots of people just want Commands That Work; let's provide them!
+		// Start with some configuration commands
+		void setLoSpdOpt(bool enable);
+		void configSyncPin(unsigned char pinFunc, unsigned char syncSteps);
+		void configStepMode(unsigned char stepMode);
+		void setMaxSpeed(float stepsPerSecond);
+		void setMinSpeed(float stepsPerSecond);
+		void setFullSpeed(float stepsPerSecond);
+		void setAcc(float stepsPerSecondPerSecond);
+		void setDec(float stepsPerSecondPerSecond);
+		void setOCThreshold(unsigned char threshold);
+		void setPWMFreq(int divisor, int multiplier);
+		void setSlewRate(int slewRate);
+		void setOCShutdown(int OCShutdown);
+		void setVoltageComp(int vsCompMode);
+		void setSwitchMode(int switchMode);
+		void setOscMode(int oscillatorMode);
+		void setAccKVAL(unsigned char kvalInput);
+		void setDecKVAL(unsigned char kvalInput);
+		void setRunKVAL(unsigned char kvalInput);
+		void setHoldKVAL(unsigned char kvalInput);
 
-    // Lots of people just want Commands That Work; let's provide them!
-    // Start with some configuration commands
-    void setLoSpdOpt(bool enable);
-    void configSyncPin(unsigned char pinFunc, unsigned char syncSteps);
-    void configStepMode(unsigned char stepMode);
-    void setMaxSpeed(float stepsPerSecond);
-    void setMinSpeed(float stepsPerSecond);
-    void setFullSpeed(float stepsPerSecond);
-    void setAcc(float stepsPerSecondPerSecond);
-    void setDec(float stepsPerSecondPerSecond);
-    void setOCThreshold(unsigned char threshold);
-    void setPWMFreq(int divisor, int multiplier);
-    void setSlewRate(int slewRate);
-    void setOCShutdown(int OCShutdown);
-    void setVoltageComp(int vsCompMode);
-    void setSwitchMode(int switchMode);
-    void setOscMode(int oscillatorMode);
-    void setAccKVAL(unsigned char kvalInput);
-    void setDecKVAL(unsigned char kvalInput);
-    void setRunKVAL(unsigned char kvalInput);
-    void setHoldKVAL(unsigned char kvalInput);
+		bool getLoSpdOpt();
+		// getSyncPin
+		unsigned char getStepMode();
+		float getMaxSpeed();
+		float getMinSpeed();
+		float getFullSpeed();
+		float getAcc();
+		float getDec();
+		unsigned char getOCThreshold();
+		int getPWMFreqDivisor();
+		int getPWMFreqMultiplier();
+		int getSlewRate();
+		int getOCShutdown();
+		int getVoltageComp();
+		int getSwitchMode();
+		int getOscMode();
+		unsigned char getAccKVAL();
+		unsigned char getDecKVAL();
+		unsigned char getRunKVAL();
+		unsigned char getHoldKVAL();
 
-    bool getLoSpdOpt();
-    // getSyncPin
-    unsigned char getStepMode();
-    float getMaxSpeed();
-    float getMinSpeed();
-    float getFullSpeed();
-    float getAcc();
-    float getDec();
-    unsigned char getOCThreshold();
-    int getPWMFreqDivisor();
-    int getPWMFreqMultiplier();
-    int getSlewRate();
-    int getOCShutdown();
-    int getVoltageComp();
-    int getSwitchMode();
-    int getOscMode();
-    unsigned char getAccKVAL();
-    unsigned char getDecKVAL();
-    unsigned char getRunKVAL();
-    unsigned char getHoldKVAL();
-
-    // ...and now, operational commands.
-    long getPos();
-    long getMark();
-    void run(unsigned char dir, float stepsPerSec);
-    void stepClock(unsigned char dir);
-    void move(unsigned char dir, unsigned long numSteps);
-    void goTo(long pos);
-    void goToDir(unsigned char dir, long pos);
-    void goUntil(unsigned char action, unsigned char dir, float stepsPerSec);
-    void releaseSw(unsigned char action, unsigned char dir);
-    void goHome();
-    void goMark();
-    void setMark(long newMark);
-    void setPos(long newPos);
-    void resetPos();
-    void resetDev();
-    void softStop();
-    void hardStop();
-    void softHiZ();
-    void hardHiZ();
+		// ...and now, operational commands.
+		long getPos();
+		long getMark();
+		void run(unsigned char dir, float stepsPerSec);
+		void stepClock(unsigned char dir);
+		void move(unsigned char dir, unsigned long numSteps);
+		void goTo(long pos);
+		void goToDir(unsigned char dir, long pos);
+		void goUntil(unsigned char action, unsigned char dir, float stepsPerSec);
+		void releaseSw(unsigned char action, unsigned char dir);
+		void goHome();
+		void goMark();
+		void setMark(long newMark);
+		void setPos(long newPos);
+		void resetPos();
+		void resetDev();
+		void softStop();
+		void hardStop();
+		void softHiZ();
+		void hardHiZ();
 
 
-private:
-    unsigned char SPIXfer(unsigned char data);
-    long xferParam(unsigned long value, unsigned char bitLen);
-    long paramHandler(unsigned char param, unsigned long value);
+	private:
+		unsigned char SPIXfer(unsigned char data);
+		long xferParam(unsigned long value, unsigned char bitLen);
+		long paramHandler(unsigned char param, unsigned long value);
 
-    // Support functions for converting from user units to L6470 units
-    unsigned long accCalc(float stepsPerSecPerSec);
-    unsigned long decCalc(float stepsPerSecPerSec);
-    unsigned long minSpdCalc(float stepsPerSec);
-    unsigned long maxSpdCalc(float stepsPerSec);
-    unsigned long FSCalc(float stepsPerSec);
-    unsigned long intSpdCalc(float stepsPerSec);
-    unsigned long spdCalc(float stepsPerSec);
+		// Support functions for converting from user units to L6470 units
+		unsigned long accCalc(float stepsPerSecPerSec);
+		unsigned long decCalc(float stepsPerSecPerSec);
+		unsigned long minSpdCalc(float stepsPerSec);
+		unsigned long maxSpdCalc(float stepsPerSec);
+		unsigned long FSCalc(float stepsPerSec);
+		unsigned long intSpdCalc(float stepsPerSec);
+		unsigned long spdCalc(float stepsPerSec);
 
-    // Support functions for converting from L6470 to user units
-    float accParse(unsigned long stepsPerSecPerSec);
-    float decParse(unsigned long stepsPerSecPerSec);
-    float minSpdParse(unsigned long stepsPerSec);
-    float maxSpdParse(unsigned long stepsPerSec);
-    float FSParse(unsigned long stepsPerSec);
-    float intSpdParse(unsigned long stepsPerSec);
-    float spdParse(unsigned long stepsPerSec);
+		// Support functions for converting from L6470 to user units
+		float accParse(unsigned long stepsPerSecPerSec);
+		float decParse(unsigned long stepsPerSecPerSec);
+		float minSpdParse(unsigned long stepsPerSec);
+		float maxSpdParse(unsigned long stepsPerSec);
+		float FSParse(unsigned long stepsPerSec);
+		float intSpdParse(unsigned long stepsPerSec);
+		float spdParse(unsigned long stepsPerSec);
 
-    int _CSPin;
-    int _resetPin;
-    int _busyPin;
-    int _position;
-    static int _numBoards;
-    SPIClass* _SPI;
-};
+		int _CSPin;
+		int _resetPin;
+		int _busyPin;
+		int _position;
+		static int _numBoards;
+		SpiDevice* _SPI;
+	};
 
-// User constants for public functions.
+	// User constants for public functions.
 
-// dSPIN direction options: functions that accept dir as an argument can be
-//  passed one of these constants. These functions are:
-//    run()
-//    stepClock()
-//    move()
-//    goToDir()
-//    goUntil()
-//    releaseSw()
+	// dSPIN direction options: functions that accept dir as an argument can be
+	//  passed one of these constants. These functions are:
+	//    run()
+	//    stepClock()
+	//    move()
+	//    goToDir()
+	//    goUntil()
+	//    releaseSw()
 #define FWD  0x01
 #define REV  0x00
 
@@ -241,8 +241,8 @@ private:
 // External switch input functionality.
 #define SW_HARD_STOP            0x0000 // Default; hard stop motor on switch.
 #define SW_USER                 0x0010 // Tie to the GoUntil and ReleaseSW
-                                       //  commands to provide jog function.
-                                       //  See page 25 of datasheet.
+									   //  commands to provide jog function.
+									   //  See page 25 of datasheet.
 
 // Clock functionality
 #define INT_16MHZ               0x0000 // Internal 16MHz, no output
@@ -258,3 +258,5 @@ private:
 #define EXT_16MHZ_OSCOUT_INVERT 0x000D // External 16MHz crystal, output inverted
 #define EXT_24MHZ_OSCOUT_INVERT 0x000E // External 24MHz crystal, output inverted
 #define EXT_32MHZ_OSCOUT_INVERT 0x000F // External 32MHz crystal, output inverted 
+
+}
