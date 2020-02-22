@@ -94,12 +94,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Amt22.cpp" />
+    <ClCompile Include="L6470.cpp" />
     <ClCompile Include="SednaMotorControl.cpp" />
     <ClCompile Include="SparkFunAutoDriver.cpp" />
     <ClCompile Include="Spi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Amt22.h" />
+    <ClInclude Include="L6470.h" />
     <ClInclude Include="SednaMotorControl.h" />
     <ClInclude Include="SparkFunAutoDriver.h" />
     <ClInclude Include="SparkFundSPINConstants.h" />
