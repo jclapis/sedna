@@ -58,25 +58,17 @@
     <Link>
       <LibraryDependencies>wiringPi</LibraryDependencies>
     </Link>
-    <RemotePostBuildEvent>
-      <Command>gpio export 17 out</Command>
-      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
-    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <Link>
       <LibraryDependencies>wiringPi</LibraryDependencies>
     </Link>
-    <RemotePostBuildEvent>
-      <Command>gpio export 17 out</Command>
-      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
-    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\SednaMotorControl\PiSpi.cpp" />
+    <ClCompile Include="PiSpi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\SednaMotorControl\PiSpi.h" />
+    <ClInclude Include="PiSpi.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <Link>

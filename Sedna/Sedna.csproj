@@ -32,8 +32,13 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <None Include="..\PiSpi\bin\ARM64\Debug\libPiSpi.so" Link="libPiSpi.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+    <None Include="..\PiSpi\bin\ARM64\Release\libPiSpi.so" Link="libPiSpi.so">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
