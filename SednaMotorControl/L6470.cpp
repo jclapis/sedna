@@ -185,9 +185,9 @@ namespace Sedna
     }
 
 
-    // =====================================
-    // === Parameter Getters and Setters ===
-    // =====================================
+    // =================================
+    // === Formatting and Conversion ===
+    // =================================
 
 
     // The formula for this conversion comes from AN3980, page 13
