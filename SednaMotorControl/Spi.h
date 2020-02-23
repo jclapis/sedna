@@ -16,12 +16,14 @@
 
 #pragma once
 
+#include <stdint.h>
+
 namespace Sedna
 {
 	/// <summary>
 	/// This defines what SPI mode a device uses.
 	/// </summary>
-	enum class SpiMode : unsigned char
+	enum class SpiMode : uint8_t
 	{
 		/// <summary>
 		/// Mode 0 (clock polarity 0, clock phase 0, clock edge 1)
@@ -69,13 +71,13 @@ namespace Sedna
 		/// <param name="TimeBetweenReads">The delay (in microseconds) to wait after unselecting a device before
 		/// it can be selected again for a subsequent read/write.</param>
 		SpiDevice(
-			unsigned char ChipSelectPin,
-			unsigned int BitRate,
-			SpiMode SpiMode,
-			unsigned char TimeBeforeRead,
-			unsigned char TimeBetweenBytes,
-			unsigned char TimeAfterRead,
-			unsigned char TimeBetweenReads
+			uint8_t ChipSelectPin,
+			uint32_t BitRate,
+			SpiMode Mode,
+			uint8_t TimeBeforeRead,
+			uint8_t TimeBetweenBytes,
+			uint8_t TimeAfterRead,
+			uint8_t TimeBetweenReads
 		);
 
 
@@ -85,7 +87,7 @@ namespace Sedna
 		/// <param name="Buffer">The buffer containing the data to write. After the transfer, this will contain
 		/// the data read from the device.</param>
 		/// <param name="BufferSize">The size of the buffer, in bytes.</param>
-		void TransferData(unsigned char* Buffer, size_t BufferSize);
+		void TransferData(uint8_t* Buffer, uint32_t BufferSize);
 
 
 	private:
@@ -94,47 +96,47 @@ namespace Sedna
 		/// WiringPi pin layout. To find what the pin number is for a given
 		/// physical pin, run `gpio readall` on your Pi.
 		/// </summary>
-		unsigned char ChipSelectPin;
+		uint8_t ChipSelectPin;
 
 
 		/// <summary>
 		/// The speed of the SPI communications for this device, in Hz.
 		/// </summary>
-		unsigned int BitRate;
+		uint32_t BitRate;
 
 
 		/// <summary>
 		/// The SPI mode that this device uses
 		/// </summary>
-		unsigned char SpiMode;
+		SpiMode Mode;
 
 
 		/// <summary>
 		/// The delay (in microseconds) between pulling the chip select pin low and
 		/// starting to read/write data from/to the device.
 		/// </summary>
-		unsigned char TimeBeforeRead;
+		uint8_t TimeBeforeRead;
 
 
 		/// <summary>
 		/// The delay (in microseconds) to wait between reading and writing individual bytes.
 		/// Some devices have specific timings for this; consult your device's datasheet.
 		/// </summary>
-		unsigned char TimeBetweenBytes;
+		uint8_t TimeBetweenBytes;
 
 
 		/// <summary>
 		/// The delay (in microseconds) to wait after finishing a data read/write before setting
 		/// the chip select pin back to high (unselecting the device).
 		/// </summary>
-		unsigned char TimeAfterRead;
+		uint8_t TimeAfterRead;
 
 
 		/// <summary>
 		/// The delay (in microseconds) to wait after unselecting a device before it can be 
 		/// selected again for a subsequent read/write.
 		/// </summary>
-		unsigned char TimeBetweenReads;
+		uint8_t TimeBetweenReads;
 	};
 
 }

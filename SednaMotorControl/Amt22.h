@@ -16,8 +16,8 @@
 
 #pragma once
 
+#include <stdint.h>
 #include "Spi.h"
-
 
 namespace Sedna
 {
@@ -32,7 +32,7 @@ namespace Sedna
         /// Creates a new Amt22 instance.
         /// </summary>
         /// <param name="ChipSelectPin">The number of the chip select pin for this device.</param>
-        Amt22(unsigned char ChipSelectPin);
+        Amt22(uint8_t ChipSelectPin);
 
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Sedna
         /// 0 to 4095. For 14-bit devices, this ranges from 0 to 16383.
         /// </summary>
         /// <returns>The position of the shaft the encoder is coupled to.</returns>
-        unsigned short GetPosition();
+        uint16_t GetPosition();
 
 
         /// <summary>
@@ -66,13 +66,13 @@ namespace Sedna
         /// <summary>
         /// The device's startup and reset time, in microseconds
         /// </summary>
-        int StartupTime;
+        uint32_t StartupTime;
 
 
         /// <summary>
         /// Validates that the data returned by the device passes its checksum test.
         /// </summary>
         /// <param name="Buffer">The data return by the device (2 bytes)</param>
-        void ValidateChecksum(unsigned char* Buffer);
+        void ValidateChecksum(uint8_t* Buffer);
     };
 }

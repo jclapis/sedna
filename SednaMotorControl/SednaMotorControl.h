@@ -16,25 +16,10 @@
 
 #pragma once
 
+#include <stdint.h>
+
 extern "C"
 {
-    /// <summary>
-    /// Defines the type of a SPI device.
-    /// </summary>
-    enum SpiDeviceType
-    {
-        /// <summary>
-        /// An L6470 autodriver 
-        /// </summary>
-        SpiDeviceType_L6470 = 0,
-
-        /// <summary>
-        /// An AMT22 rotary encoder
-        /// </summary>
-        SpiDeviceType_Amt22 = 1
-    };
-
-
     /// <summary>
     /// Initializes the motor control system. This must be called before anything else.
     /// </summary>
@@ -50,21 +35,30 @@ extern "C"
 
 
     /// <summary>
-    /// Creates a handle to an AMT22 rotary encoder.
+    /// Creates a new MotorAssembly instance.
     /// </summary>
-    /// <param name="ChipSelectPin">The number of the chip select pin for this device.
-    /// This uses the WiringPi pin layout. To find what the pin number is for a given
-    /// physical pin, run `gpio readall` on your Pi.</param>
-    /// <param name="Device">[OUT] A handle to the new device.</param>
-    /// <returns>0 if this was successful, -1 if an error occurred. Use GetLastError() to
-    /// see what went wrong.</returns>
-    int CreateAmt22(unsigned char ChipSelectPin, void** Device);
+    /// <param name="MotorSelectPin">The number of the SPI chip select pin for the L6470,
+    /// using the WiringPI pin layout.</param>
+    /// <param name="EncoderSelectPin">The number of the SPI chip select pin for the AMT22,
+    /// using the WiringPI pin layout.</param>
+    /// <param name="StepAngle">The angle for a single step of the motor. This will come
+    /// from the motor's spec sheet.</param>
+    /// <param name="MaxCurrent">The maximum amount of current, in Amps, that the motor can
+    /// tolerate before declaring an overcurrent event.</param>
+    /// <param name="MotorAssembly">[OUT] A handle to the new motor assembly.</param>
+    int CreateMotorAssembly(
+        uint8_t MotorSelectPin,
+        uint8_t EncoderSelectPin,
+        float StepAngle,
+        float MaxCurrent,
+        void** MotorAssembly);
 
 
     /// <summary>
-    /// Frees an AMT22 device.
+    /// Deletes a motor assembly, freeing its memory.
     /// </summary>
-    /// <param name="Device">The handle of the device to free.</param>
-    void FreeAmt22(void* Device);
+    /// <param name="Assembly">The motor assembly to free. This must have been created by
+    /// the CreateMotorAssembly function.</param>
+    void FreeMotorAssembly(void* Assembly);
 
 }

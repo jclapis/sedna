@@ -21,86 +21,87 @@
 #include "Amt22.h"
 
 using namespace std;
-using namespace Sedna;
 
-
-Amt22::Amt22(unsigned char ChipSelectPin) :
-    Spi(ChipSelectPin, 1000000, SpiMode::Mode0, 3, 3, 40, 3),
-    StartupTime(200000)
+namespace Sedna
 {
-
-}
-
-
-void Amt22::ValidateChecksum(unsigned char* Buffer)
-{
-    bool k1 = (Buffer[0] >> 7 & 1);
-    bool k0 = (Buffer[0] >> 6 & 1);
-
-    bool h5 = (Buffer[0] >> 5 & 1);
-    bool h4 = (Buffer[0] >> 4 & 1);
-    bool h3 = (Buffer[0] >> 3 & 1);
-    bool h2 = (Buffer[0] >> 2 & 1);
-    bool h1 = (Buffer[0] >> 1 & 1);
-    bool h0 = (Buffer[0] >> 0 & 1);
-
-    bool l7 = (Buffer[1] >> 7 & 1);
-    bool l6 = (Buffer[1] >> 6 & 1);
-    bool l5 = (Buffer[1] >> 5 & 1);
-    bool l4 = (Buffer[1] >> 4 & 1);
-    bool l3 = (Buffer[1] >> 3 & 1);
-    bool l2 = (Buffer[1] >> 2 & 1);
-    bool l1 = (Buffer[1] >> 1 & 1);
-    bool l0 = (Buffer[1] >> 0 & 1);
-
-    bool oddCheck = !(h5 ^ h3 ^ h1 ^ l7 ^ l5 ^ l3 ^ l1);
-    bool evenCheck = !(h4 ^ h2 ^ h0 ^ l6 ^ l4 ^ l2 ^ l0);
-
-    if (k1 != oddCheck)
+    Amt22::Amt22(uint8_t ChipSelectPin)
+        : Spi(ChipSelectPin, 1000000, SpiMode::Mode0, 3, 3, 40, 3),
+        StartupTime(200000)
     {
-        stringstream error;
-        error << "Odd checksum bit failed (" << hex << (int)Buffer[0] << ", " << hex << (int)Buffer[1] << ")";
-        throw runtime_error(error.str());
+
     }
-    if (k0 != evenCheck)
+
+
+    void Amt22::ValidateChecksum(unsigned char* Buffer)
     {
-        stringstream error;
-        error << "Even checksum bit failed (" << hex << (int)Buffer[0] << ", " << hex << (int)Buffer[1] << ")";
-        throw runtime_error(error.str());
+        bool k1 = (Buffer[0] >> 7 & 1);
+        bool k0 = (Buffer[0] >> 6 & 1);
+
+        bool h5 = (Buffer[0] >> 5 & 1);
+        bool h4 = (Buffer[0] >> 4 & 1);
+        bool h3 = (Buffer[0] >> 3 & 1);
+        bool h2 = (Buffer[0] >> 2 & 1);
+        bool h1 = (Buffer[0] >> 1 & 1);
+        bool h0 = (Buffer[0] >> 0 & 1);
+
+        bool l7 = (Buffer[1] >> 7 & 1);
+        bool l6 = (Buffer[1] >> 6 & 1);
+        bool l5 = (Buffer[1] >> 5 & 1);
+        bool l4 = (Buffer[1] >> 4 & 1);
+        bool l3 = (Buffer[1] >> 3 & 1);
+        bool l2 = (Buffer[1] >> 2 & 1);
+        bool l1 = (Buffer[1] >> 1 & 1);
+        bool l0 = (Buffer[1] >> 0 & 1);
+
+        bool oddCheck = !(h5 ^ h3 ^ h1 ^ l7 ^ l5 ^ l3 ^ l1);
+        bool evenCheck = !(h4 ^ h2 ^ h0 ^ l6 ^ l4 ^ l2 ^ l0);
+
+        if (k1 != oddCheck)
+        {
+            stringstream error;
+            error << "Odd checksum bit failed (" << hex << (int)Buffer[0] << ", " << hex << (int)Buffer[1] << ")";
+            throw runtime_error(error.str());
+        }
+        if (k0 != evenCheck)
+        {
+            stringstream error;
+            error << "Even checksum bit failed (" << hex << (int)Buffer[0] << ", " << hex << (int)Buffer[1] << ")";
+            throw runtime_error(error.str());
+        }
     }
-}
 
 
-unsigned short Amt22::GetPosition()
-{
-    // Read from the device and validate that it came back OK
-    unsigned char buffer[] = { 0x00, 0x00 };
-    Spi.TransferData(buffer, 2);
-    ValidateChecksum(buffer);
-    
-    // Make a short from the data
-    unsigned short data = 0;
-    data += (buffer[0] << 8);
-    data += buffer[1];
+    uint16_t Amt22::GetPosition()
+    {
+        // Read from the device and validate that it came back OK
+        uint8_t buffer[] = { 0x00, 0x00 };
+        Spi.TransferData(buffer, 2);
+        ValidateChecksum(buffer);
 
-    // Get rid of the 2 checksum bits at the top
-    data &= 0x3FFF;
+        // Make a short from the data
+        uint16_t data = 0;
+        data += (buffer[0] << 8);
+        data += buffer[1];
 
-    return data;
-}
+        // Get rid of the 2 checksum bits at the top
+        data &= 0x3FFF;
 
-
-void Amt22::Reset()
-{
-    unsigned char buffer[] = { 0x00, 0x60 };
-    Spi.TransferData(buffer, 2);
-    delayMicroseconds(StartupTime);
-}
+        return data;
+    }
 
 
-void Amt22::SetZeroPosition()
-{
-    unsigned char buffer[] = { 0x00, 0x70 };
-    Spi.TransferData(buffer, 2);
-    delayMicroseconds(StartupTime);
+    void Amt22::Reset()
+    {
+        uint8_t buffer[] = { 0x00, 0x60 };
+        Spi.TransferData(buffer, 2);
+        delayMicroseconds(StartupTime);
+    }
+
+
+    void Amt22::SetZeroPosition()
+    {
+        uint8_t buffer[] = { 0x00, 0x70 };
+        Spi.TransferData(buffer, 2);
+        delayMicroseconds(StartupTime);
+    }
 }
