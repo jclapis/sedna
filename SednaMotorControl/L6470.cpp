@@ -31,14 +31,19 @@ namespace Sedna
         SetParam_8Bit(Register::StepMode, stepMode);
 
         // Default to a max speed of as high as it goes, I guess...
-        uint16_t maxSpeed = 0b1111111111;
+        uint16_t maxSpeed = 0x03FF;
         SetParam_16Bit(Register::MaximumSpeed, maxSpeed);
 
-        // Set the full speed (AKA "turbo mode", the threshold at which it disables microstepping)
-        // to a default of 300 RPM. That seems like a lot so it's probably a good starting point.
+        // Set the full-step speed (the threshold at which it disables microstepping)
+        // to a default of 300 RPM. That seems like a lot so it's probably a good
+        // starting point.
         uint16_t fullStepSpeed = GetFormattedFullStepSpeed(300.0);
         SetParam_16Bit(Register::FullStepSpeed, fullStepSpeed);
 
+        // Set the acceleration and deceleration to 500 RPM/sec.
+        uint16_t acceleration = GetFormattedAcceleration(500.0);
+        SetParam_16Bit(Register::Acceleration, acceleration);
+        SetParam_16Bit(Register::Deceleration, acceleration);
 
         // Set the config register to the following defaults:
         // OSC_SEL and EXT_CLK = 0000; 16 MHz internal clock, no output
@@ -194,11 +199,28 @@ namespace Sedna
 
         // Clamp the value to the lowest 10-bits since the FS_SPD register takes
         // a 10-bit value
-        if (formattedSpeed > 0b1111111111)
+        if (formattedSpeed > 0x03FF)
         {
-            return 0b1111111111;
+            return 0x03FF;
         }
         return static_cast<uint16_t>(formattedSpeed);
+    }
+
+
+    // The formula for this conversion comes from AN3980, page 13
+    uint16_t L6470::GetFormattedAcceleration(float RPMPerSecond)
+    {
+        float stepsPerRev = 360.0 / StepAngle;
+        float stepsPerSecond_2 = RPMPerSecond / 60.0 * stepsPerRev;
+        float formattedAcceleration = stepsPerSecond_2 * 0.068719476736 + 0.5;
+
+        // Clamp the value to the lowest 12-bits since the ACC / DEC registers
+        // take 12-bit values
+        if (formattedAcceleration > 0x0FFF)
+        {
+            return 0x0FFF;
+        }
+        return static_cast<uint16_t>(formattedAcceleration);
     }
 
 }

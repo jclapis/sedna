@@ -19,8 +19,8 @@
 namespace Sedna
 {
     MotorAssembly::MotorAssembly(
-        unsigned char MotorSelectPin,
-        unsigned char EncoderSelectPin,
+        uint8_t MotorSelectPin,
+        uint8_t EncoderSelectPin,
         float StepAngle,
         float MaxCurrent)
         :

@@ -424,5 +424,7 @@ namespace Sedna
         uint8_t GetClosestOvercurrentThreshold(float MaxMotorCurrent);
 
         uint16_t GetFormattedFullStepSpeed(float RPM);
+
+        uint16_t GetFormattedAcceleration(float RPMPerSecond);
     };
 }

@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <stdint.h>
 #include "Amt22.h"
 #include "L6470.h"
 
@@ -41,8 +42,8 @@ namespace Sedna
         /// <param name="MaxCurrent">The maximum amount of current, in Amps, that the motor can
         /// tolerate before declaring an overcurrent event.</param>
         MotorAssembly(
-            unsigned char MotorSelectPin,
-            unsigned char EncoderSelectPin,
+            uint8_t MotorSelectPin,
+            uint8_t EncoderSelectPin,
             float StepAngle,
             float MaxCurrent);
 
