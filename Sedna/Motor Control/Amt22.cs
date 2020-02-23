@@ -27,7 +27,7 @@ namespace Sedna
     /// Please see the datasheet for details:
     /// https://www.cuidevices.com/product/resource/amt22.pdf
     /// </remarks>
-    internal class Amt22 : IDisposable
+    public class Amt22 : IDisposable
     {
         /// <summary>
         /// The underlying SPI device used to communicate with the AMT22

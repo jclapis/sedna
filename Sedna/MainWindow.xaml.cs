@@ -572,5 +572,19 @@ namespace Sedna
             ViewfinderSpeedLabel.Text = $"Viewfinder FPS: {fps}";
         }
 
+
+        public void MotorButton_Click(object sender, RoutedEventArgs e)
+        {
+            MotorControlWindow window = new MotorControlWindow
+            {
+                Owner = this
+            };
+
+            Amt22 encoder = new Amt22(11);
+            L6470 driver = new L6470(12, 0.9, 1.7);
+            window.SetHardware(encoder, driver);
+            window.Show();
+        }
+
     }
 }

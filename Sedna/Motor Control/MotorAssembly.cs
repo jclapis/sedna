@@ -23,7 +23,7 @@ namespace Sedna
     /// <summary>
     /// This class represents an assembly of an L6470, a stepper motor, and an AMT22.
     /// </summary>
-    internal class MotorAssembly : IDisposable
+    public class MotorAssembly : IDisposable
     {
         /// <summary>
         /// The rotary encoder coupled to the assembly
@@ -57,6 +57,29 @@ namespace Sedna
             Driver = new L6470(MotorSelectPin, StepAngle, MaxCurrent);
         }
 
+
+        /// <summary>
+        /// The current position of the motor assembly, from 0 to 1. 
+        /// </summary>
+        public ushort Position
+        {
+            get
+            {
+                return Encoder.GetPosition();
+            }
+        }
+
+
+        /// <summary>
+        /// The current, in amps, that the motor is currently pulling.
+        /// </summary>
+        public double Current
+        {
+            get
+            {
+                return -1; // NYI
+            }
+        }
 
 
         #region IDisposable Support

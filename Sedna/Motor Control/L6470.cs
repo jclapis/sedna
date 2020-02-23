@@ -33,7 +33,7 @@ namespace Sedna
     /// This represents the options for the overcurrent threshold setting. It corresponds
     /// to the OCD_TH register.
     /// </summary>
-    internal enum OvercurrentThreshold : byte
+    public enum OvercurrentThreshold : byte
     {
         _375mA,
         _750mA,
@@ -59,7 +59,7 @@ namespace Sedna
     /// a step into microsteps). It corresponds to the lowest 3 bits of the STEP_MODE
     /// register.
     /// </summary>
-    internal enum MicrostepMode : byte
+    public enum MicrostepMode : byte
     {
         _1PerStep,
         _2PerStep,
@@ -82,7 +82,7 @@ namespace Sedna
     /// <remarks>
     /// Consult pages 32 and 49 of the datasheet for more info on the PWM stuff.
     /// </remarks>
-    internal enum PwmFrequency : byte
+    public enum PwmFrequency : byte
     {
         /// <summary>
         /// 2.790 kHz
@@ -279,7 +279,7 @@ namespace Sedna
     /// <summary>
     /// Indicates which direction the motor is moving.
     /// </summary>
-    internal enum MotorDirection : byte
+    public enum MotorDirection : byte
     {
         Reverse,
         Forward
@@ -289,7 +289,7 @@ namespace Sedna
     /// <summary>
     /// Indicates what the motor is currently doing.
     /// </summary>
-    internal enum MotorActivity : byte
+    public enum MotorActivity : byte
     {
         Stopped,
         Accelerating,
@@ -301,7 +301,7 @@ namespace Sedna
     /// <summary>
     /// These are the IDs of the various registers on the L6470
     /// </summary>
-    internal enum Register : byte
+    public enum Register : byte
     {
         AbsolutePosition = 0x01,
         ElectricalPosition,
@@ -336,7 +336,7 @@ namespace Sedna
     /// <summary>
     /// This represents the current status of an L6470.
     /// </summary>
-    internal class L6470Status
+    public class L6470Status
     {
         /// <summary>
         /// True if step clock mode is active, false if it's in a normal running mode.
@@ -525,7 +525,7 @@ namespace Sedna
     /// This application note (AN3980) is also very helpful:
     /// https://www.st.com/resource/en/application_note/dm00037891.pdf
     /// </remarks>
-    internal class L6470 : IDisposable
+    public class L6470 : IDisposable
     {
         /// <summary>
         /// The underlying SPI device used to communicate with the L6470
