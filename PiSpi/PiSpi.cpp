@@ -137,18 +137,6 @@ PiSpi_Result PiSpi_TransferData(void* Device, uint8_t* Buffer, uint32_t BufferSi
 {
     SpiDevice* device = static_cast<SpiDevice*>(Device);
 
-    // Set up the SPI transfer structure
-    __u64 bufferAsLong = reinterpret_cast<__u64>(Buffer);
-    spi_ioc_transfer spiTransfer;
-    memset(&spiTransfer, 0, sizeof(spiTransfer));
-
-    spiTransfer.speed_hz = device->BitRate;
-    spiTransfer.word_delay_usecs = device->TimeBetweenBytes;
-    spiTransfer.len = static_cast<__u32>(BufferSize);
-    spiTransfer.rx_buf = bufferAsLong;
-    spiTransfer.tx_buf = bufferAsLong;
-
-
     // Set the SPI mode
     int result = ioctl(SpiDevDescriptor, SPI_IOC_WR_MODE, &device->Mode);
     if (result == -1)
@@ -157,16 +145,57 @@ PiSpi_Result PiSpi_TransferData(void* Device, uint8_t* Buffer, uint32_t BufferSi
         return PiSpi_SettingSpiModeFailed;
     }
 
+    // Before we do a transfer, we have to make sure the SPI clock is in the right
+    // polarity (modes 0 and 1 need to be low, modes 2 and 3 need to be high) before
+    // pulling down the chip select. If we did a transfer using a device with a different
+    // polarity right before this one, then the clock will be left in the wrong state
+    // when we set the chip select pin, and the SPI device will behave improperly.
+    // Since we don't own the SPI clock pin, the easiest way to do this is to run a 
+    // "dummy" SPI transfer with none of the chip select pins flagged now that we just set
+    // the right mode. We aren't actually talking to anything in this transfer, but the
+    // clock will be set to the correct state afterwards so the device behaves correctly.
+    uint8_t dummyByte;
+    spi_ioc_transfer dummyTransfer;
+    memset(&dummyTransfer, 0, sizeof(dummyTransfer));
+    __u64 dummyBytePtr = reinterpret_cast<__u64>(&dummyByte);
+    dummyTransfer.len = static_cast<__u32>(sizeof(uint8_t));
+    dummyTransfer.rx_buf = dummyBytePtr;
+    dummyTransfer.tx_buf = dummyBytePtr;
+    ioctl(SpiDevDescriptor, SPI_IOC_MESSAGE(1), &dummyTransfer);
+
     // Pull the CS pin down and wait for the device to be ready
     digitalWrite(device->ChipSelectPin, LOW);
     delayMicroseconds(device->TimeBeforeRead);
 
     // Run the transfer
-    result = ioctl(SpiDevDescriptor, SPI_IOC_MESSAGE(1), &spiTransfer);
-    if (result == -1)
+    // NOTE: this has to be split into a bunch of manual byte read/writes because
+    // the Pi doesn't respect the inter-byte delay (spi_ioc_transfer.word_delay_usecs).
+    // For devices that rely on this time being higher than the Pi runs by default, this
+    // will break any transfers after the first byte.
+    // See https://raspberrypi.stackexchange.com/questions/73649/raspberry-pi-spi-and-interbyte-delay
+    // for more info.
+    spi_ioc_transfer spiTransfer;
+    memset(&spiTransfer, 0, sizeof(spiTransfer));
+    spiTransfer.speed_hz = device->BitRate;
+    for (int i = 0; i < BufferSize; i++)
     {
-        SetLastError("Error transferring data to/from the SPI device");
-        return PiSpi_SpiTransferFailed;
+        // Set up the transfer structure
+        uint8_t* currentBufferBytePointer = Buffer + i;
+        __u64 bufferAsLong = reinterpret_cast<__u64>(currentBufferBytePointer);
+        spiTransfer.len = static_cast<__u32>(sizeof(uint8_t));
+        spiTransfer.rx_buf = bufferAsLong;
+        spiTransfer.tx_buf = bufferAsLong;
+
+        // Run the transfer
+        result = ioctl(SpiDevDescriptor, SPI_IOC_MESSAGE(1), &spiTransfer);
+        if (result == -1)
+        {
+            SetLastError("Error transferring data to/from the SPI device");
+            return PiSpi_SpiTransferFailed;
+        }
+
+        // Wait for the specified time between bytes
+        delayMicroseconds(device->TimeBetweenBytes);
     }
 
     // Wait for the cooldown before setting the CS pin back to high
