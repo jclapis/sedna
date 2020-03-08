@@ -89,7 +89,7 @@
           <Border Grid.Row="1" Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="4">
             <StackPanel Grid.Column="0" Margin="5">
 
-              <Button Name="ToggleMotorButton" Content="Engage Motors"/>
+              <Button Name="ToggleMotorButton" Content="Engage Motors" Click="MotorButton_Click"/>
               <TextBlock Height="20"/>
 
               <TextBlock Name="FocusLabel" Text="Focus Position: 0"/>

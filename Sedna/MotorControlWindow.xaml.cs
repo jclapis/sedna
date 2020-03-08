@@ -23,6 +23,7 @@ namespace Sedna
 {
     public class MotorControlWindow : Window
     {
+        private readonly TextBlock ShaftPositionBox;
         private readonly TextBlock CoilAStalledBox;
         private readonly TextBlock CoilBStalledBox;
         private readonly TextBlock OvercurrentBox;
@@ -51,11 +52,12 @@ namespace Sedna
 #if DEBUG
             this.AttachDevTools();
 #endif
+            ShaftPositionBox = this.FindControl<TextBlock>("ShaftPositionBox");
             CoilAStalledBox = this.FindControl<TextBlock>("CoilAStalledBox");
             CoilBStalledBox = this.FindControl<TextBlock>("CoilBStalledBox");
             OvercurrentBox = this.FindControl<TextBlock>("OvercurrentBox");
             ThermalShutdownBox = this.FindControl<TextBlock>("ThermalShutdownBox");
-            ThermalWarningBox = this.FindControl<TextBlock>("CoilAStThermalWarningBoxalledBox");
+            ThermalWarningBox = this.FindControl<TextBlock>("ThermalWarningBox");
             UndervoltageBox = this.FindControl<TextBlock>("UndervoltageBox");
             UnknownCommandBox = this.FindControl<TextBlock>("UnknownCommandBox");
             LastCommandFailedBox = this.FindControl<TextBlock>("LastCommandFailedBox");
@@ -82,6 +84,9 @@ namespace Sedna
 
         public void RefreshStatus_Click(object sender, RoutedEventArgs e)
         {
+            ushort position = Encoder.GetPosition();
+            ShaftPositionBox.Text = position.ToString();
+
             L6470Status status = Driver.GetStatus();
             CoilAStalledBox.Text = (status.BridgeAStalled ? "YES" : "");
             CoilBStalledBox.Text = (status.BridgeBStalled ? "YES" : "");

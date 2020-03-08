@@ -137,7 +137,7 @@ namespace Sedna
         /// <returns>PiSpi_OK on a success, or one of the error codes (all negative numbers) on a failure.
         /// Call PiSpi_GetLastError() for more information.</returns>
         [DllImport(PiSpiLib, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        private static extern PiSpi_Result CreateSpiDevice(
+        private static extern PiSpi_Result PiSpi_CreateDevice(
             byte ChipSelectPin,
             uint BitRate,
             SpiMode Mode,
@@ -212,7 +212,7 @@ namespace Sedna
             byte TimeAfterRead,
             byte TimeBetweenReads)
         {
-            PiSpi_Result result = CreateSpiDevice(ChipSelectPin, BitRate, Mode,
+            PiSpi_Result result = PiSpi_CreateDevice(ChipSelectPin, BitRate, Mode,
                 TimeBeforeRead, TimeBetweenBytes, TimeAfterRead, TimeBetweenReads, out IntPtr handle);
             if (result != PiSpi_Result.PiSpi_OK)
             {

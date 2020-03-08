@@ -13,36 +13,38 @@
     <Grid Grid.Column="0" Margin="10,5" RowDefinitions="Auto, Auto, Auto">
       <TextBlock Grid.Row="0" Text="Focus Motor" FontSize="16" HorizontalAlignment="Center"/>
       <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="5">
-        <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
-          <TextBlock Grid.Row="0" Grid.Column="0" Text="Coil A Stalled:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="1" Grid.Column="0" Text="Coil B Stalled:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="2" Grid.Column="0" Text="Overcurrent Detected:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="3" Grid.Column="0" Text="Thermal Shutdown:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="4" Grid.Column="0" Text="Thermal Warning:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="5" Grid.Column="0" Text="Undervoltage:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="6" Grid.Column="0" Text="Unknown Command:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="7" Grid.Column="0" Text="Last Command Failed:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="8" Grid.Column="0" Text="Motor Activity:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="9" Grid.Column="0" Text="Direction:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="10" Grid.Column="0" Text="Kill Switch Triggered:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="11" Grid.Column="0" Text="Kill Switch Active:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="12" Grid.Column="0" Text="Busy:" HorizontalAlignment="Right" Margin="5"/>
-          <TextBlock Grid.Row="13" Grid.Column="0" Text="Coils Active:" HorizontalAlignment="Right" Margin="5"/>
+        <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
+          <TextBlock Grid.Row="0" Grid.Column="0" Text="Shaft Position:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="1" Grid.Column="0" Text="Coil A Stalled:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="2" Grid.Column="0" Text="Coil B Stalled:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="3" Grid.Column="0" Text="Overcurrent Detected:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="4" Grid.Column="0" Text="Thermal Shutdown:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="5" Grid.Column="0" Text="Thermal Warning:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="6" Grid.Column="0" Text="Undervoltage:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="7" Grid.Column="0" Text="Unknown Command:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="8" Grid.Column="0" Text="Last Command Failed:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="9" Grid.Column="0" Text="Motor Activity:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="10" Grid.Column="0" Text="Direction:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="11" Grid.Column="0" Text="Kill Switch Triggered:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="12" Grid.Column="0" Text="Kill Switch Active:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="13" Grid.Column="0" Text="Busy:" HorizontalAlignment="Right" Margin="5"/>
+          <TextBlock Grid.Row="14" Grid.Column="0" Text="Coils Active:" HorizontalAlignment="Right" Margin="5"/>
 
-          <TextBlock Name="CoilAStalledBox" Grid.Row="0" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="CoilBStalledBox" Grid.Row="1" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="OvercurrentBox" Grid.Row="2" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="ThermalShutdownBox" Grid.Row="3" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="ThermalWarningBox" Grid.Row="4" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="UndervoltageBox" Grid.Row="5" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="UnknownCommandBox" Grid.Row="6" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="LastCommandFailedBox" Grid.Row="7" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="MotorStateBox" Grid.Row="8" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="DirectionBox" Grid.Row="9" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="KillSwitchTriggerBox" Grid.Row="10" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="KillSwitchActiveBox" Grid.Row="11" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="IsBusyBox" Grid.Row="12" Grid.Column="1" Text="---" Margin="5"/>
-          <TextBlock Name="HiZBox" Grid.Row="13" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="ShaftPositionBox" Grid.Row="0" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="CoilAStalledBox" Grid.Row="1" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="CoilBStalledBox" Grid.Row="2" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="OvercurrentBox" Grid.Row="3" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="ThermalShutdownBox" Grid.Row="4" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="ThermalWarningBox" Grid.Row="5" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="UndervoltageBox" Grid.Row="6" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="UnknownCommandBox" Grid.Row="7" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="LastCommandFailedBox" Grid.Row="8" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="MotorStateBox" Grid.Row="9" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="DirectionBox" Grid.Row="10" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="KillSwitchTriggerBox" Grid.Row="11" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="KillSwitchActiveBox" Grid.Row="12" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="IsBusyBox" Grid.Row="13" Grid.Column="1" Text="---" Margin="5"/>
+          <TextBlock Name="HiZBox" Grid.Row="14" Grid.Column="1" Text="---" Margin="5"/>
         </Grid>
       </Border>
       <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="5">

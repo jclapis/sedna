@@ -580,8 +580,8 @@ namespace Sedna
                 Owner = this
             };
 
-            Amt22 encoder = new Amt22(11);
-            L6470 driver = new L6470(12, 0.9, 1.7);
+            Amt22 encoder = new Amt22(17);
+            L6470 driver = new L6470(18, 0.9, 1.7);
             window.SetHardware(encoder, driver);
             window.Show();
         }
