@@ -36,12 +36,20 @@ namespace Sedna
 
 
         /// <summary>
+        /// The logger for capturing debug and info messages
+        /// </summary>
+        private readonly Logger Logger;
+
+
+        /// <summary>
         /// Creates a new Amt22 instance.
         /// </summary>
         /// <param name="ChipSelectPin">The number of the chip select pin for this device,
-        /// using the WiringPi numbering scheme.</param>
-        public Amt22(byte ChipSelectPin)
+        /// using the BCM numbering scheme.</param>
+        /// <param name="Logger">The logger for capturing debug and info messages</param>
+        public Amt22(byte ChipSelectPin, Logger Logger)
         {
+            this.Logger = Logger; 
             Spi = new SpiDevice(ChipSelectPin, 1000000, SpiMode.Mode0, 3, 3, 40, 3);
         }
 
@@ -51,12 +59,20 @@ namespace Sedna
         /// 0 to 4095. For 14-bit devices, this ranges from 0 to 16383.
         /// </summary>
         /// <returns>The position of the shaft the encoder is coupled to.</returns>
-        public ushort GetPosition()
+        public int GetPosition()
         {
             // Read from the device and validate that it came back OK
-            byte[] buffer = { 0x00, 0x00 };
+            byte[] buffer = { 0x00, 0x00 }; 
             Spi.TransferData(buffer);
-            ValidateChecksum(buffer);
+            try
+            {
+                ValidateChecksum(buffer);
+            }
+            catch(Exception ex)
+            {
+                Logger.Error(ex.Message);
+                return -1;
+            }
 
             // Make a short from the data
             ushort data = 0;
@@ -127,11 +143,11 @@ namespace Sedna
 
             if (k1 != oddCheck)
             {
-                throw new Exception($"Odd checksum bit failed (0x{Buffer[0].ToString("X2")}, 0x{Buffer[1].ToString("X2")})");
+                throw new Exception($"AMT22: Odd checksum bit failed (0x{Buffer[0].ToString("X2")}, 0x{Buffer[1].ToString("X2")})");
             }
             if (k0 != evenCheck)
             {
-                throw new Exception($"Even checksum bit failed (0x{Buffer[0].ToString("X2")}, 0x{Buffer[1].ToString("X2")})");
+                throw new Exception($"AMT22: Even checksum bit failed (0x{Buffer[0].ToString("X2")}, 0x{Buffer[1].ToString("X2")})");
             }
         }
 

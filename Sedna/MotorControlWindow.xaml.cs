@@ -84,7 +84,7 @@ namespace Sedna
 
         public void RefreshStatus_Click(object sender, RoutedEventArgs e)
         {
-            ushort position = Encoder.GetPosition();
+            int position = Encoder.GetPosition();
             ShaftPositionBox.Text = position.ToString();
 
             L6470Status status = Driver.GetStatus();

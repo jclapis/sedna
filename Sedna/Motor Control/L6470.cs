@@ -555,7 +555,7 @@ namespace Sedna
         /// Creates a new <see cref="L6470"/> instance.
         /// </summary>
         /// <param name="ChipSelectPin">The number of the chip select pin for this device,
-        /// using the WiringPi numbering scheme.</param>
+        /// using the BCM numbering scheme.</param>
         /// <param name="StepAngle">The angle that a single motor step moves the motor shaft,
         /// in degrees</param>
         /// <param name="MaxCurrent">The max current the motor can sustain, per coil, in amps.</param>

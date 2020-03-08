@@ -23,7 +23,7 @@ namespace Sedna
     /// <summary>
     /// This logs messages to the UI's log box.
     /// </summary>
-    internal class Logger
+    public class Logger
     {
         /// <summary>
         /// The text box in the UI to add the messages to

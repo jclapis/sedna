@@ -120,7 +120,7 @@ namespace Sedna
         /// It will also initialize the chip select pin to output mode and set it HIGH.
         /// </summary>
         /// <param name="ChipSelectPin">The number of the chip select pin for this device. This uses the
-        /// WiringPi pin layout. To find what the pin number is for a given physical pin, run `gpio readall`
+        /// BCM pin layout. To find what the pin number is for a given physical pin, run `gpio readall`
         /// on your Pi.</param>
         /// <param name="BitRate">The speed of the SPI communications for this device, in Hz.</param>
         /// <param name="Mode">The SPI mode that this device uses</param>
@@ -190,7 +190,7 @@ namespace Sedna
         /// It will also initialize the chip select pin to output mode and set it HIGH.
         /// </summary>
         /// <param name="ChipSelectPin">The number of the chip select pin for this device. This uses the
-        /// WiringPi pin layout. To find what the pin number is for a given physical pin, run `gpio readall`
+        /// BCM pin layout. To find what the pin number is for a given physical pin, run `gpio readall`
         /// on your Pi.</param>
         /// <param name="BitRate">The speed of the SPI communications for this device, in Hz.</param>
         /// <param name="Mode">The SPI mode that this device uses</param>
