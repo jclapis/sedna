@@ -30,22 +30,22 @@ extern "C" {
 		/// <summary>
 		/// Mode 0 (clock polarity 0, clock phase 0, clock edge 1)
 		/// </summary>
-		PiSpi_SpiMode0,
+		PiSpi_SpiMode0 = SPI_MODE_0,
 
 		/// <summary>
 		/// Mode 1 (clock polarity 0, clock phase 1, clock edge 0)
 		/// </summary>
-		PiSpi_SpiMode1,
+		PiSpi_SpiMode1 = SPI_MODE_1,
 
 		/// <summary>
 		/// Mode 2 (clock polarity 1, clock phase 0, clock edge 1)
 		/// </summary>
-		PiSpi_SpiMode2,
+		PiSpi_SpiMode2 = SPI_MODE_2,
 
 		/// <summary>
 		/// Mode 3 (clock polarity 1, clock phase 1, clock edge 0)
 		/// </summary>
-		PiSpi_SpiMode3
+		PiSpi_SpiMode3 = SPI_MODE_3
 	};
 
 

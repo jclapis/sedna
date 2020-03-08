@@ -14,6 +14,13 @@
  * limitations under the License.
  * ======================================================================== */
 
+// Import the spidev header as C, otherwise the mode macros (e.g. SPI_IOC_RD_MODE)
+// won't always work. Shoutout to Phil Mills on StackOverflow for figuring this out:
+// https://stackoverflow.com/questions/31572738/spi-ioc-messagen-macro-giving-me-fits
+extern "C"
+{
+    #include <linux/spi/spidev.h>
+}
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -21,7 +28,6 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <asm/ioctl.h>
-#include <linux/spi/spidev.h>
 #include <wiringPi.h>
 #include "PiSpi.h"
 
@@ -47,7 +53,7 @@ struct SpiDevice
 {
     uint8_t ChipSelectPin;
     uint32_t BitRate;
-    PiSpi_SpiMode Mode;
+    int Mode;
     uint8_t TimeBeforeRead;
     uint8_t TimeBetweenBytes;
     uint8_t TimeAfterRead;
@@ -69,7 +75,7 @@ PiSpi_Result PiSpi_CreateDevice(
     if (SpiDevDescriptor == 0)
     {
         // Initialize WiringPi
-        int result = wiringPiSetup();
+        int result = wiringPiSetupSys();
         if (result == -1)
         {
             SetLastError("WiringPi failed to setup properly");
@@ -144,7 +150,7 @@ PiSpi_Result PiSpi_TransferData(void* Device, uint8_t* Buffer, uint32_t BufferSi
 
 
     // Set the SPI mode
-    int result = ioctl(SpiDevDescriptor, SPI_IOC_WR_MODE, device->Mode);
+    int result = ioctl(SpiDevDescriptor, SPI_IOC_WR_MODE, &device->Mode);
     if (result == -1)
     {
         SetLastError("Failed to set the SPI mode");
