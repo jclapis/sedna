@@ -158,6 +158,9 @@ namespace Sedna
         private Task LiveViewTask;
 
 
+        private FocusAssembly FocusAssembly;
+
+
         /// <summary>
         /// Creates the main window.
         /// </summary>
@@ -198,6 +201,7 @@ namespace Sedna
             }
 
             RefreshCameras();
+            LoadHardware();
         }
 
 
@@ -219,6 +223,22 @@ namespace Sedna
             if(CameraManager != null)
             {
                 CameraManager.Dispose();
+            }
+        }
+
+
+        private void LoadHardware()
+        {
+            FocusAssembly = new FocusAssembly(Logger, 18, 17, 0.9, 1.7, 5000, 15000);
+            FocusAssembly.MoveFinished += FocusAssembly_MoveFinished;
+        }
+
+
+        private void FocusAssembly_MoveFinished(object sender, FocusMoveResult e)
+        {
+            if(!e.Succeeded)
+            {
+                Logger.Error($"Focus movement failed: {e.ErrorMessage}");
             }
         }
 
@@ -580,9 +600,7 @@ namespace Sedna
                 Owner = this
             };
 
-            Amt22 encoder = new Amt22(17, Logger);
-            L6470 driver = new L6470(18, 0.9, 1.7);
-            window.SetHardware(encoder, driver);
+            window.SetHardware(FocusAssembly);
             window.Show();
         }
 

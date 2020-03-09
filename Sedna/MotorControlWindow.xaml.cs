@@ -71,10 +71,10 @@ namespace Sedna
             RpmBox = this.FindControl<TextBlock>("RpmBox");
         }
 
-        public void SetHardware(Amt22 Encoder, L6470 Driver)
+        public void SetHardware(FocusAssembly FocusAssembly)
         {
-            this.Encoder = Encoder;
-            this.Driver = Driver;
+            Encoder = FocusAssembly.Encoder;
+            Driver = FocusAssembly.Driver;
         }
 
         private void InitializeComponent()

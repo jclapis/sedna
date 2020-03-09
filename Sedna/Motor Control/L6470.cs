@@ -536,19 +536,55 @@ namespace Sedna
         /// <summary>
         /// The angle that a single motor step moves the motor shaft, in degrees
         /// </summary>
-        private readonly double StepAngle;
+        public double StepAngle { get; }
+
+
+        /// <summary>
+        /// The max current the motor can sustain, per coil, in amps.
+        /// </summary>
+        public double MaxCurrent { get; }
 
 
         /// <summary>
         /// The motor's speed, in RPM
         /// </summary>
-        public uint Speed { get; set; }
+        public double DesiredSpeed { get; set; }
 
 
         /// <summary>
         /// The motor's direction
         /// </summary>
         public MotorDirection Direction { get; set; }
+
+
+        /// <summary>
+        /// The microstepping mode (how each full step is divided into microsteps). Setting this
+        /// paramter will cause the motor to shut down and its bridges to stop.
+        /// </summary>
+        public MicrostepMode MicrostepMode
+        {
+            get
+            {
+                byte stepMode = GetParam_8Bit(Register.StepMode);
+                byte microstepSetting = (byte)(stepMode & 0b00000111); // Remove the SYNC_EN and SYNC_SEL bits
+                return (MicrostepMode)microstepSetting;
+            }
+            set
+            {
+                SoftHiZ();
+
+                // Set the new microstepping mode, leaving SYNC_EN and SYNC_SEL to 0
+                byte requestedMode = (byte)value;
+                SetParam_8Bit(Register.StepMode, requestedMode);
+
+                // Make sure the setting was applied properly
+                byte appliedMode = GetParam_8Bit(Register.StepMode);
+                if(requestedMode != appliedMode)
+                {
+                    throw new Exception($"Attempted to set microstep mode to {requestedMode} but it came back as {appliedMode}.");
+                }
+            }
+        }
 
 
         /// <summary>
@@ -563,6 +599,7 @@ namespace Sedna
         {
             Spi = new SpiDevice(ChipSelectPin, 4000000, SpiMode.Mode3, 1, 0, 1, 1);
             this.StepAngle = StepAngle;
+            this.MaxCurrent = MaxCurrent;
 
             // Set the overcurrent threshold
             byte overcurrentTheshold = GetClosestOvercurrentThreshold(MaxCurrent);
@@ -656,34 +693,12 @@ namespace Sedna
 
 
         /// <summary>
-        /// Sets the microstepping mode. This can only be done when the motor isn't running
-        /// and the coils are disabled, so this will perform a soft HiZ first.
-        /// </summary>
-        /// <param name="Mode">The new microstepping mode</param>
-        public void SetMicrostepMode(MicrostepMode Mode)
-        {
-            SoftHiZ();
-
-            // Wait for the HiZ finish
-            L6470Status status = GetStatus();
-            while(status.IsBusy || status.BridgesActive)
-            {
-                Thread.Sleep(10);
-                status = GetStatus();
-            }
-
-            // Set the new microstepping mode, leaving SYNC_EN and SYNC_SEL to 0
-            SetParam_8Bit(Register.StepMode, (byte)Mode);
-        }
-
-
-        /// <summary>
-        /// Runs the motor using the <see cref="Speed"/> and <see cref="Direction"/>
+        /// Runs the motor using the <see cref="DesiredSpeed"/> and <see cref="Direction"/>
         /// properties.
         /// </summary>
         public void Run()
         {
-            uint formattedSpeed = GetFormattedSpeed(Speed);
+            uint formattedSpeed = GetFormattedSpeed(DesiredSpeed);
             byte command = 0b01010000;
             if(Direction == MotorDirection.Forward)
             {
@@ -703,49 +718,86 @@ namespace Sedna
 
         /// <summary>
         /// Slowly stops the motor, using the gradual deceleration curve.
+        /// This will block until the driver reports that the stop has finished
+        /// and the system is now idle.
         /// </summary>
         public void SoftStop()
         {
             byte[] buffer = { 0b10110000 };
             Spi.TransferData(buffer);
+
+            // Wait for the stop to finish
+            L6470Status status = GetStatus();
+            while (status.IsBusy)
+            {
+                Thread.Sleep(10);
+                status = GetStatus();
+            }
         }
 
 
         /// <summary>
         /// Immediately stops the motor, ignoring the deceleration curve,
-        /// but keeps the coils engaged (holding).
+        /// but keeps the coils engaged (holding). This will block until the driver
+        /// reports that the stop has finished and the system is now idle.
         /// </summary>
         public void HardStop()
         {
             byte[] buffer = { 0b10111000 };
             Spi.TransferData(buffer);
+
+            // Wait for the stop finish
+            L6470Status status = GetStatus();
+            while (status.IsBusy)
+            {
+                Thread.Sleep(10);
+                status = GetStatus();
+            }
         }
 
 
         /// <summary>
         /// Gracefully stops the motor using the gradual deceleration curve,
-        /// then disengages the coils.
+        /// then disengages the coils. This will block until the driver reports
+        /// that the stop has finished and the system is now idle.
         /// </summary>
         public void SoftHiZ()
         {
             byte[] buffer = { 0b10100000 };
             Spi.TransferData(buffer);
+
+            // Wait for the HiZ to finish
+            L6470Status status = GetStatus();
+            while (status.IsBusy || status.BridgesActive)
+            {
+                Thread.Sleep(10);
+                status = GetStatus();
+            }
         }
 
 
         /// <summary>
         /// Immediately stops the motor, ignoring the deceleration curve,
         /// and disenages the coils. This is like an "EMERGENCY STOP!" function.
+        /// This will block until the driver reports that the stop has finished
+        /// and the system is now idle.
         /// </summary>
         public void HardHiZ()
         {
             byte[] buffer = { 0b10101000 };
             Spi.TransferData(buffer);
+
+            // Wait for the HiZ to finish
+            L6470Status status = GetStatus();
+            while (status.IsBusy || status.BridgesActive)
+            {
+                Thread.Sleep(10);
+                status = GetStatus();
+            }
         }
 
         #endregion
-
-
+        
         #region Parameter Getters and Setters
 
         /// <summary>
