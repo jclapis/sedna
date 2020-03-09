@@ -597,7 +597,7 @@ namespace Sedna
         /// <param name="MaxCurrent">The max current the motor can sustain, per coil, in amps.</param>
         public L6470(byte ChipSelectPin, double StepAngle, double MaxCurrent)
         {
-            Spi = new SpiDevice(ChipSelectPin, 4000000, SpiMode.Mode3, 1, 0, 1, 1);
+            Spi = new SpiDevice(ChipSelectPin, 1000000, SpiMode.Mode3, 0, 0, 0, 0);
             this.StepAngle = StepAngle;
             this.MaxCurrent = MaxCurrent;
 
@@ -632,10 +632,10 @@ namespace Sedna
             // POW_SR = 11; 530 V/us for maximum torque
             // F_PWM_INT and F_PWM_DEC = 000111; 62.5 kHz PWM output
             ushort config = 0;
-            config |= (1 << 5); // Set EN_VSCOMP to 1
+            //config |= (1 << 5); // Set EN_VSCOMP to 1
             config |= (1 << 7); // Set OC_SD to 1
             config |= (0b11 << 8); // Set POW_SR to 530 V/us
-            config |= ((byte)PwmFrequency._62_500 << 10);
+            config |= ((byte)PwmFrequency._31_250 << 10);
             SetParam_16Bit(Register.Configuration, config);
         }
 
