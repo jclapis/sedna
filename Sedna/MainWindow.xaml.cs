@@ -240,7 +240,7 @@ namespace Sedna
 
         private void LoadHardware()
         {
-            FocusAssembly = new FocusAssembly(Logger, 18, 27, 17, 0.9, 1.7, 5000, 15000);
+            FocusAssembly = new FocusAssembly(Logger, 18, 27, 17, 0.9, 1.7, 6150, 16150);
             FocusAssembly.MoveFinished += FocusAssembly_MoveFinished;
         }
 
