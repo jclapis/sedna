@@ -152,6 +152,7 @@ namespace Sedna
             int BoundSafetyThreshold = 500,
             int EncoderUpdateRate = 50)
         {
+            this.Logger = Logger;
             Encoder = new Amt22(EncoderSelectPin, Logger);
             Driver = new L6470(MotorSelectPin, MotorResetPin, StepAngle, MaxCurrent);
             this.LowerEncoderBound = LowerEncoderBound;
@@ -164,7 +165,7 @@ namespace Sedna
         }
 
 
-        public void MoveToPosition(double Position, double MaxRPM = 3)
+        public void MoveToPosition(double Position, double MaxRPM = 60)
         {
             // Clamp the input position to something between 0 and 1
             Position = Math.Min(1.0, Position);
@@ -177,7 +178,8 @@ namespace Sedna
             lock (MoveLock)
             {
                 Logger.Debug($"Moving to focus position {Position} (encoder value {encoderPosition})");
-                DesiredPosition = (int)Math.Round(Position);
+                Driver.DesiredSpeed = MaxRPM;
+                DesiredPosition = (int)Math.Round(encoderPosition);
                 if(MoveTask == null)
                 {
                     MoveTask = Task.Run(MovementLoop);
