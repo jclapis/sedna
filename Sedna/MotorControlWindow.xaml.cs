@@ -123,6 +123,7 @@ namespace Sedna
 
             double rpm = (double)e.NewValue;
             RpmBox.Text = $"{rpm.ToString("N2")} RPM";
+            Driver.DesiredSpeed = rpm;
         }
 
         public void RunButton_Click(object sender, RoutedEventArgs e)

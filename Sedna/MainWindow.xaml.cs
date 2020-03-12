@@ -224,12 +224,16 @@ namespace Sedna
             {
                 CameraManager.Dispose();
             }
+            if(FocusAssembly != null)
+            {
+                FocusAssembly.Dispose();
+            }
         }
 
 
         private void LoadHardware()
         {
-            FocusAssembly = new FocusAssembly(Logger, 18, 17, 0.9, 1.7, 5000, 15000);
+            FocusAssembly = new FocusAssembly(Logger, 18, 27, 17, 0.9, 1.7, 5000, 15000);
             FocusAssembly.MoveFinished += FocusAssembly_MoveFinished;
         }
 

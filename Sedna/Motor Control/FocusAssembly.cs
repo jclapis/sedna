@@ -143,6 +143,7 @@ namespace Sedna
         public FocusAssembly(
             Logger Logger,
             byte MotorSelectPin,
+            byte MotorResetPin,
             byte EncoderSelectPin,
             double StepAngle,
             double MaxCurrent,
@@ -152,7 +153,7 @@ namespace Sedna
             int EncoderUpdateRate = 50)
         {
             Encoder = new Amt22(EncoderSelectPin, Logger);
-            Driver = new L6470(MotorSelectPin, StepAngle, MaxCurrent);
+            Driver = new L6470(MotorSelectPin, MotorResetPin, StepAngle, MaxCurrent);
             this.LowerEncoderBound = LowerEncoderBound;
             this.UpperEncoderBound = UpperEncoderBound;
             this.BoundSafetyThreshold = BoundSafetyThreshold;

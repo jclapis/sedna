@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Width="800"
+        SizeToContent="Height"
         x:Class="Sedna.MotorControlWindow"
         Title="MotorControlWindow"
         
@@ -53,7 +54,7 @@
           <RadioButton Grid.Row="1" GroupName="MotorDirection" Content="Forward" Margin="5" Checked="ForwardRadio_Checked"/>
           <RadioButton Grid.Row="2" GroupName="MotorDirection" Content="Reverse" Margin="5" Checked="ReverseRadio_Checked"/>
           <Grid Grid.Row="3" ColumnDefinitions="*, Auto" Margin="5">
-            <Slider Name="RpmSlider" Grid.Column="0" Minimum="0" Maximum="1000" PropertyChanged="RpmSlider_PropertyChanged"/>
+            <Slider Name="RpmSlider" Grid.Column="0" Minimum="0" Maximum="300" SmallChange="1" LargeChange="10" Value="0" PropertyChanged="RpmSlider_PropertyChanged"/>
             <TextBlock Name="RpmBox" Grid.Column="1" Text="0 RPM"/>
           </Grid>
           <Button Grid.Row="4" Content="Run Motor!" Margin="5" Click="RunButton_Click"/>
