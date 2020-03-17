@@ -132,6 +132,12 @@ namespace Sedna
 
 
         /// <summary>
+        /// The label with the focus position setting
+        /// </summary>
+        private readonly TextBlock FocusLabel;
+
+
+        /// <summary>
         /// The underlying bitmap source that viewfinder data will be written to for display
         /// </summary>
         private WriteableBitmap ViewfinderBitmap;
@@ -191,6 +197,7 @@ namespace Sedna
             VerticalCrosshairBar = this.FindControl<Rectangle>("VerticalCrosshairBar");
             HorizontalCrosshairBar = this.FindControl<Rectangle>("HorizontalCrosshairBar");
             CrosshairCircle = this.FindControl<Ellipse>("CrosshairCircle");
+            FocusLabel = this.FindControl<TextBlock>("FocusLabel");
 
             // Misc other setup
             LiveViewDelay = 50;
@@ -224,12 +231,16 @@ namespace Sedna
             {
                 CameraManager.Dispose();
             }
+            if(FocusAssembly != null)
+            {
+                FocusAssembly.Dispose();
+            }
         }
 
 
         private void LoadHardware()
         {
-            FocusAssembly = new FocusAssembly(Logger, 18, 17, 0.9, 1.7, 5000, 15000);
+            FocusAssembly = new FocusAssembly(Logger, 18, 27, 17, 0.9, 1.7, 6150, 16150);
             FocusAssembly.MoveFinished += FocusAssembly_MoveFinished;
         }
 
@@ -602,6 +613,18 @@ namespace Sedna
 
             window.SetHardware(FocusAssembly);
             window.Show();
+        }
+
+        public void FocusSlider_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property.Name != "Value")
+            {
+                return;
+            }
+
+            double position = (double)e.NewValue;
+            FocusLabel.Text = $"Focus Position: {position.ToString("N3")}";
+            FocusAssembly.MoveToPosition(position);
         }
 
     }

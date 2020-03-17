@@ -133,6 +133,60 @@ void PiSpi_FreeDevice(void* Device)
 }
 
 
+PiSpi_Result RunTransferWithoutDelaysBetweenBytes(SpiDevice* Device, uint8_t* Buffer, uint32_t BufferSize)
+{
+    // Set up the SPI transfer structure
+    __u64 bufferAsLong = reinterpret_cast<__u64>(Buffer);
+    spi_ioc_transfer spiTransfer;
+    memset(&spiTransfer, 0, sizeof(spiTransfer));
+
+    spiTransfer.speed_hz = Device->BitRate;
+    spiTransfer.len = static_cast<__u32>(BufferSize);
+    spiTransfer.rx_buf = bufferAsLong;
+    spiTransfer.tx_buf = bufferAsLong;
+
+    // Run the transfer
+    int result = ioctl(SpiDevDescriptor, SPI_IOC_MESSAGE(1), &spiTransfer);
+    if (result == -1)
+    {
+        SetLastError("Error transferring data to/from the SPI device");
+        return PiSpi_SpiTransferFailed;
+    }
+
+    return PiSpi_OK;
+}
+
+
+PiSpi_Result RunTransferWithDelaysBetweenBytes(SpiDevice* Device, uint8_t* Buffer, uint32_t BufferSize)
+{
+    spi_ioc_transfer spiTransfer;
+    memset(&spiTransfer, 0, sizeof(spiTransfer));
+    spiTransfer.speed_hz = Device->BitRate;
+    for (int i = 0; i < BufferSize; i++)
+    {
+        // Set up the transfer structure
+        uint8_t* currentBufferBytePointer = Buffer + i;
+        __u64 bufferAsLong = reinterpret_cast<__u64>(currentBufferBytePointer);
+        spiTransfer.len = static_cast<__u32>(sizeof(uint8_t));
+        spiTransfer.rx_buf = bufferAsLong;
+        spiTransfer.tx_buf = bufferAsLong;
+
+        // Run the transfer
+        int result = ioctl(SpiDevDescriptor, SPI_IOC_MESSAGE(1), &spiTransfer);
+        if (result == -1)
+        {
+            SetLastError("Error transferring data to/from the SPI device");
+            return PiSpi_SpiTransferFailed;
+        }
+
+        // Wait for the specified time between bytes
+        delayMicroseconds(Device->TimeBetweenBytes);
+    }
+
+    return PiSpi_OK;
+}
+
+
 PiSpi_Result PiSpi_TransferData(void* Device, uint8_t* Buffer, uint32_t BufferSize)
 {
     SpiDevice* device = static_cast<SpiDevice*>(Device);
@@ -165,45 +219,39 @@ PiSpi_Result PiSpi_TransferData(void* Device, uint8_t* Buffer, uint32_t BufferSi
 
     // Pull the CS pin down and wait for the device to be ready
     digitalWrite(device->ChipSelectPin, LOW);
-    delayMicroseconds(device->TimeBeforeRead);
+    if (device->TimeBeforeRead > 0)
+    {
+        delayMicroseconds(device->TimeBeforeRead);
+    }
 
     // Run the transfer
-    // NOTE: this has to be split into a bunch of manual byte read/writes because
-    // the Pi doesn't respect the inter-byte delay (spi_ioc_transfer.word_delay_usecs).
-    // For devices that rely on this time being higher than the Pi runs by default, this
-    // will break any transfers after the first byte.
-    // See https://raspberrypi.stackexchange.com/questions/73649/raspberry-pi-spi-and-interbyte-delay
-    // for more info.
-    spi_ioc_transfer spiTransfer;
-    memset(&spiTransfer, 0, sizeof(spiTransfer));
-    spiTransfer.speed_hz = device->BitRate;
-    for (int i = 0; i < BufferSize; i++)
+    PiSpi_Result transferResult;
+    if (device->TimeBetweenBytes > 0)
     {
-        // Set up the transfer structure
-        uint8_t* currentBufferBytePointer = Buffer + i;
-        __u64 bufferAsLong = reinterpret_cast<__u64>(currentBufferBytePointer);
-        spiTransfer.len = static_cast<__u32>(sizeof(uint8_t));
-        spiTransfer.rx_buf = bufferAsLong;
-        spiTransfer.tx_buf = bufferAsLong;
-
-        // Run the transfer
-        result = ioctl(SpiDevDescriptor, SPI_IOC_MESSAGE(1), &spiTransfer);
-        if (result == -1)
-        {
-            SetLastError("Error transferring data to/from the SPI device");
-            return PiSpi_SpiTransferFailed;
-        }
-
-        // Wait for the specified time between bytes
-        delayMicroseconds(device->TimeBetweenBytes);
+        transferResult = RunTransferWithDelaysBetweenBytes(device, Buffer, BufferSize);
+    }
+    else
+    {
+        transferResult = RunTransferWithoutDelaysBetweenBytes(device, Buffer, BufferSize);
+    }
+    if (transferResult != PiSpi_OK)
+    {
+        digitalWrite(device->ChipSelectPin, HIGH);
+        return transferResult;
     }
 
     // Wait for the cooldown before setting the CS pin back to high
-    delayMicroseconds(device->TimeAfterRead);
+    if (device->TimeAfterRead > 0)
+    {
+        delayMicroseconds(device->TimeAfterRead);
+    }
     digitalWrite(device->ChipSelectPin, HIGH);
 
     // Wait for the device to be ready to use again
-    delayMicroseconds(device->TimeBetweenReads);
+    if (device->TimeBetweenReads > 0)
+    {
+        delayMicroseconds(device->TimeBetweenReads);
+    }
 
     return PiSpi_OK;
 }

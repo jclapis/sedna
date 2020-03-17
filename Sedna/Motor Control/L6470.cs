@@ -23,6 +23,8 @@
 
 
 using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Sedna
@@ -528,6 +530,58 @@ namespace Sedna
     public class L6470 : IDisposable
     {
         /// <summary>
+        /// Defines the constants that represent the modes for GPIO pins.
+        /// </summary>
+        private enum PinMode
+        {
+            /// <summary>
+            /// Input mode
+            /// </summary>
+            Input = 0,
+
+            /// <summary>
+            /// Output mode
+            /// </summary>
+            Output = 1
+        }
+
+
+        /// <summary>
+        /// Defines the state of a GPIO pin.
+        /// </summary>
+        private enum PinState
+        {
+            /// <summary>
+            /// Low (0v)
+            /// </summary>
+            Low = 0,
+
+            /// <summary>
+            /// High (3.3v)
+            /// </summary>
+            High = 1
+        }
+
+
+        /// <summary>
+        /// Sets the mode of the provided GPIO pin.
+        /// </summary>
+        /// <param name="Pin">The pin to set the mode for</param>
+        /// <param name="Mode">The mode to set the pin to</param>
+        [DllImport("libwiringPi.so", CharSet = CharSet.Ansi, ExactSpelling = true)]
+        private static extern void pinMode(int Pin, PinMode Mode);
+
+
+        /// <summary>
+        /// Sets the state of the provided GPIO pin.
+        /// </summary>
+        /// <param name="Pin">The pin to set the state for</param>
+        /// <param name="Mode">The state to set the pin to</param>
+        [DllImport("libwiringPi.so", CharSet = CharSet.Ansi, ExactSpelling = true)]
+        private static extern void digitalWrite(int Pin, PinState State);
+
+
+        /// <summary>
         /// The underlying SPI device used to communicate with the L6470
         /// </summary>
         private readonly SpiDevice Spi;
@@ -592,14 +646,34 @@ namespace Sedna
         /// </summary>
         /// <param name="ChipSelectPin">The number of the chip select pin for this device,
         /// using the BCM numbering scheme.</param>
+        /// <param name="ResetPin">The number of the reset pin for this device, using the
+        /// BCM numbering scheme.</param>
         /// <param name="StepAngle">The angle that a single motor step moves the motor shaft,
         /// in degrees</param>
         /// <param name="MaxCurrent">The max current the motor can sustain, per coil, in amps.</param>
-        public L6470(byte ChipSelectPin, double StepAngle, double MaxCurrent)
+        /// <remarks>
+        /// As a quick note, the L6470's SPI spec actually *requires* that the chip select be
+        /// put back to high after every byte, then pulled low again to read the next byte.
+        /// I don't know why it works this way, but it does. The getters and setters will look
+        /// different from the AMT22, where the chip select stays low for the entire exchange...
+        /// but that's how it is!
+        /// </remarks>
+        public L6470(byte ChipSelectPin, byte ResetPin, double StepAngle, double MaxCurrent)
         {
-            Spi = new SpiDevice(ChipSelectPin, 4000000, SpiMode.Mode3, 1, 0, 1, 1);
+            Spi = new SpiDevice(ChipSelectPin, 1000000, SpiMode.Mode3, 0, 0, 0, 0);
             this.StepAngle = StepAngle;
             this.MaxCurrent = MaxCurrent;
+
+            // Reset the driver
+            pinMode(ResetPin, PinMode.Output);
+            digitalWrite(ResetPin, PinState.Low);
+            Thread.Sleep(1);
+            digitalWrite(ResetPin, PinState.High);
+            Thread.Sleep(1);
+
+            // Get the current config
+            ushort config = GetParam_16Bit(Register.Configuration);
+            L6470Status status = GetStatus();
 
             // Set the overcurrent threshold
             byte overcurrentTheshold = GetClosestOvercurrentThreshold(MaxCurrent);
@@ -631,11 +705,11 @@ namespace Sedna
             // OC_SD = 1; enabled
             // POW_SR = 11; 530 V/us for maximum torque
             // F_PWM_INT and F_PWM_DEC = 000111; 62.5 kHz PWM output
-            ushort config = 0;
-            config |= (1 << 5); // Set EN_VSCOMP to 1
+            config = 0;
+            //config |= (1 << 5); // Set EN_VSCOMP to 1
             config |= (1 << 7); // Set OC_SD to 1
             config |= (0b11 << 8); // Set POW_SR to 530 V/us
-            config |= ((byte)PwmFrequency._62_500 << 10);
+            config |= ((byte)PwmFrequency._31_250 << 10);
             SetParam_16Bit(Register.Configuration, config);
         }
 
@@ -681,12 +755,20 @@ namespace Sedna
         /// <returns>The device status</returns>
         public L6470Status GetStatus()
         {
-            byte[] buffer = { 0b11010000, 0, 0 };
+            // Send the GetStatus command
+            byte command = 0b11010000;
+            byte[] buffer = { command };
             Spi.TransferData(buffer);
 
+            // Get the 2 status bytes
             ushort status = 0;
-            status |= (ushort)(buffer[1] << 8);
-            status |= buffer[2];
+            buffer[0] = 0;
+            Spi.TransferData(buffer);
+            status |= (ushort)(buffer[0] << 8);
+
+            buffer[0] = 0;
+            Spi.TransferData(buffer);
+            status |= buffer[0];
 
             return new L6470Status(status);
         }
@@ -698,7 +780,6 @@ namespace Sedna
         /// </summary>
         public void Run()
         {
-            uint formattedSpeed = GetFormattedSpeed(DesiredSpeed);
             byte command = 0b01010000;
             if(Direction == MotorDirection.Forward)
             {
@@ -707,11 +788,17 @@ namespace Sedna
                 command |= 1;
             }
 
-            byte[] buffer = { command, 0, 0, 0 };
-            buffer[1] = (byte)(formattedSpeed >> 16);
-            buffer[2] = (byte)(formattedSpeed >> 8);
-            buffer[3] = (byte)formattedSpeed;
+            // Send the command
+            byte[] buffer = { command };
+            Spi.TransferData(buffer);
 
+            // Send the speed, one byte at a time
+            uint formattedSpeed = GetFormattedSpeed(DesiredSpeed);
+            buffer[0] = (byte)(formattedSpeed >> 16);
+            Spi.TransferData(buffer);
+            buffer[0] = (byte)(formattedSpeed >> 8);
+            Spi.TransferData(buffer);
+            buffer[0] = (byte)formattedSpeed;
             Spi.TransferData(buffer);
         }
 
@@ -810,12 +897,14 @@ namespace Sedna
             // Create the GetParam command (001, then the 5 register bits)
             byte command = (byte)(0b00100000 | (byte)Register);
 
-            // Make the SPI buffer - the first byte is the command, the rest are for the response
-            byte[] buffer = { command, 0 };
-
-            // Run the SPI transfer and return the response byte
+            // Send the command
+            byte[] buffer = { command };
             Spi.TransferData(buffer);
-            return buffer[1];
+
+            // Get the response
+            buffer[0] = 0;
+            Spi.TransferData(buffer);
+            return buffer[0];
         }
 
 
@@ -829,16 +918,20 @@ namespace Sedna
             // Create the GetParam command (001, then the 5 register bits)
             byte command = (byte)(0b00100000 | (byte)Register);
 
-            // Make the SPI buffer - the first byte is the command, the rest are for the response
-            byte[] buffer = { command, 0, 0 };
-
-            // Run the SPI transfer
+            // Send the command
+            byte[] buffer = { command };
             Spi.TransferData(buffer);
 
-            // Build a short from the response and return it
+            // Get the 2 response bytes and put them into a short
             ushort response = 0;
-            response |= (ushort)(buffer[1] << 8);
-            response |= buffer[2];
+            buffer[0] = 0;
+            Spi.TransferData(buffer);
+            response |= (ushort)(buffer[0] << 8);
+
+            buffer[0] = 0;
+            Spi.TransferData(buffer);
+            response |= buffer[0];
+            
             return response;
         }
 
@@ -853,17 +946,27 @@ namespace Sedna
             // Create the GetParam command (001, then the 5 register bits)
             byte command = (byte)(0b00100000 | (byte)Register);
 
-            // Make the SPI buffer - the first byte is the command, the rest are for the response
-            byte[] buffer = { command, 0, 0, 0 };
+            // Send the command
+            byte[] buffer = { command };
+            Spi.TransferData(buffer);
 
             // Run the SPI transfer
             Spi.TransferData(buffer);
 
-            // Build an int from the response and return it
+            // Get the 3 response bytes and put them into an int
             uint response = 0;
-            response |= (uint)(buffer[1] << 16);
-            response |= (uint)(buffer[2] << 8);
-            response |= buffer[3];
+            buffer[0] = 0;
+            Spi.TransferData(buffer);
+            response |= (uint)(buffer[0] << 16);
+
+            buffer[0] = 0;
+            Spi.TransferData(buffer);
+            response |= (uint)(buffer[0] << 8);
+
+            buffer[0] = 0;
+            Spi.TransferData(buffer);
+            response |= buffer[0];
+
             return response;
         }
 
@@ -878,8 +981,12 @@ namespace Sedna
             // Create the SetParam command (000, then the 5 register bits)
             byte command = (byte)Register;
 
-            // Make the SPI buffer and run the SPI transfer
-            byte[] buffer = { command, Value };
+            // Send the command
+            byte[] buffer = { command };
+            Spi.TransferData(buffer);
+
+            // Send the argument
+            buffer[0] = Value;
             Spi.TransferData(buffer);
         }
 
@@ -894,10 +1001,14 @@ namespace Sedna
             // Create the SetParam command (000, then the 5 register bits)
             byte command = (byte)Register;
 
-            // Make the SPI buffer and run the SPI transfer
-            byte[] buffer = { command, 0, 0 };
-            buffer[1] = (byte)(Value >> 8);
-            buffer[2] = (byte)(Value);
+            // Send the command
+            byte[] buffer = { command };
+            Spi.TransferData(buffer);
+
+            // Send the argument, one byte at a time
+            buffer[0] = (byte)(Value >> 8);
+            Spi.TransferData(buffer);
+            buffer[0] = (byte)(Value);
             Spi.TransferData(buffer);
         }
 
@@ -912,11 +1023,16 @@ namespace Sedna
             // Create the SetParam command (000, then the 5 register bits)
             byte command = (byte)Register;
 
-            // Make the SPI buffer and run the SPI transfer
-            byte[] buffer = { command, 0, 0, 0 };
-            buffer[1] = (byte)(Value >> 16);
-            buffer[2] = (byte)(Value >> 8);
-            buffer[3] = (byte)(Value);
+            // Send the command
+            byte[] buffer = { command };
+            Spi.TransferData(buffer);
+
+            // Send the argument, one byte at a time
+            buffer[0] = (byte)(Value >> 16);
+            Spi.TransferData(buffer);
+            buffer[0] = (byte)(Value >> 8);
+            Spi.TransferData(buffer);
+            buffer[0] = (byte)(Value);
             Spi.TransferData(buffer);
         }
 
@@ -1006,6 +1122,7 @@ namespace Sedna
             {
                 if (disposing)
                 {
+                    SoftHiZ();
                     Spi.Dispose();
                 }
                 

@@ -93,7 +93,7 @@
               <TextBlock Height="20"/>
 
               <TextBlock Name="FocusLabel" Text="Focus Position: 0"/>
-              <Slider Name="FocusSlider" Height="24" Minimum="0" Maximum="16384" TickFrequency="1" Value="0" />
+              <Slider Name="FocusSlider" Height="24" Minimum="0" Maximum="1" SmallChange="0.001" LargeChange="0.1" TickFrequency="0.1" Value="0" PropertyChanged="FocusSlider_PropertyChanged"/>
               <Grid ColumnDefinitions="*,5,*,5,*,5,*">
                 <Button Name="FastLowerFocus" Grid.Column="0" Content="&lt;&lt;" FontWeight="Bold"/>
                 <Button Name="LowerFocus" Grid.Column="2" Content="&lt;"/>

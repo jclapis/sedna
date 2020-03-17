@@ -78,6 +78,12 @@ namespace Sedna
         private int DesiredPosition;
 
 
+        private double MaxRPM;
+
+
+        private double CurrentSpeed;
+
+
         private bool StopMove;
 
 
@@ -124,6 +130,9 @@ namespace Sedna
         public int BoundSafetyThreshold { get; set; }
 
 
+        public int TargetThreshold { get; set; }
+
+
         private int MoveLoopDelay;
 
 
@@ -143,19 +152,23 @@ namespace Sedna
         public FocusAssembly(
             Logger Logger,
             byte MotorSelectPin,
+            byte MotorResetPin,
             byte EncoderSelectPin,
             double StepAngle,
             double MaxCurrent,
             int LowerEncoderBound,
             int UpperEncoderBound,
             int BoundSafetyThreshold = 500,
+            int TargetThreshold = 5,
             int EncoderUpdateRate = 50)
         {
+            this.Logger = Logger;
             Encoder = new Amt22(EncoderSelectPin, Logger);
-            Driver = new L6470(MotorSelectPin, StepAngle, MaxCurrent);
+            Driver = new L6470(MotorSelectPin, MotorResetPin, StepAngle, MaxCurrent);
             this.LowerEncoderBound = LowerEncoderBound;
             this.UpperEncoderBound = UpperEncoderBound;
             this.BoundSafetyThreshold = BoundSafetyThreshold;
+            this.TargetThreshold = TargetThreshold;
             this.EncoderUpdateRate = EncoderUpdateRate;
 
             StopMove = false;
@@ -163,7 +176,7 @@ namespace Sedna
         }
 
 
-        public void MoveToPosition(double Position, double MaxRPM = 3)
+        public void MoveToPosition(double Position, double MaxRPM = 300)
         {
             // Clamp the input position to something between 0 and 1
             Position = Math.Min(1.0, Position);
@@ -176,8 +189,9 @@ namespace Sedna
             lock (MoveLock)
             {
                 Logger.Debug($"Moving to focus position {Position} (encoder value {encoderPosition})");
-                DesiredPosition = (int)Math.Round(Position);
-                if(MoveTask == null)
+                this.MaxRPM = MaxRPM;
+                DesiredPosition = (int)Math.Round(encoderPosition);
+                if(MoveTask == null || MoveTask.Status != TaskStatus.Running)
                 {
                     MoveTask = Task.Run(MovementLoop);
                 }
@@ -205,18 +219,25 @@ namespace Sedna
                     return;
                 }
 
-                // Get the current position
+                // Get the current position and distance to the target
                 int currentPosition = Encoder.GetPosition();
+                int delta = Math.Abs(currentPosition - DesiredPosition);
 
-                // See which direction we're supposed to go
+                // See which direction we're supposed to go, or if we're close enough
                 MotorAction action = MotorAction.Stop;
-                if(DesiredPosition > currentPosition)
+                if(delta < TargetThreshold)
+                {
+                    action = MotorAction.Stop;
+                }
+                else if(DesiredPosition > currentPosition)
                 {
                     action = MotorAction.Forward;
+                    delta = Math.Min(delta, UpperEncoderBound - BoundSafetyThreshold - currentPosition);
                 }
                 else if(DesiredPosition < currentPosition)
                 {
                     action = MotorAction.Reverse;
+                    delta = Math.Min(delta, currentPosition - LowerEncoderBound - BoundSafetyThreshold);
                 }
 
                 // See if the move would take us out of bounds, and if so, don't do it!
@@ -228,6 +249,8 @@ namespace Sedna
                 {
                     action = MotorAction.Stop;
                 }
+
+                double newRpm = GetSpeedSetting(delta);
 
                 // Perform the requested action
                 switch(action)
@@ -242,19 +265,27 @@ namespace Sedna
 
                     // Go forward if it isn't already going forward
                     case MotorAction.Forward:
-                        if(Driver.Direction == MotorDirection.Reverse || status.MotorState == MotorActivity.Stopped)
+                        if (Driver.Direction == MotorDirection.Reverse || 
+                            status.MotorState == MotorActivity.Stopped ||
+                            newRpm != CurrentSpeed)
                         {
                             Driver.Direction = MotorDirection.Forward;
+                            Driver.DesiredSpeed = newRpm;
                             Driver.Run();
+                            CurrentSpeed = newRpm;
                         }
                         break;
 
                     // Go backward if it isn't already going backward
                     case MotorAction.Reverse:
-                        if(Driver.Direction == MotorDirection.Forward || status.MotorState == MotorActivity.Stopped)
+                        if (Driver.Direction == MotorDirection.Forward || 
+                            status.MotorState == MotorActivity.Stopped ||
+                            newRpm != CurrentSpeed)
                         {
                             Driver.Direction = MotorDirection.Reverse;
+                            Driver.DesiredSpeed = newRpm;
                             Driver.Run();
+                            CurrentSpeed = newRpm;
                         }
                         break;
                 }
@@ -268,6 +299,33 @@ namespace Sedna
             result = new FocusMoveResult(true, null);
             MoveFinished?.Invoke(this, result);
             return;
+        }
+
+
+        private double GetSpeedSetting(int Delta)
+        {
+            // This is some placeholder throttling 
+            if(Delta > 500)
+            {
+                return Math.Min(300, MaxRPM);
+            }
+
+            if(Delta > 250)
+            {
+                return Math.Min(125, MaxRPM);
+            }
+
+            if (Delta > 125)
+            {
+                return Math.Min(60, MaxRPM);
+            }
+
+            if (Delta > 60)
+            {
+                return Math.Min(20, MaxRPM);
+            }
+
+            return 5;
         }
 
 
