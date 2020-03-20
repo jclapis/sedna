@@ -1,0 +1,56 @@
+** Assuming between 12.5v and 36v in, 400 kHz **
+
+R_FILT = https://www.mouser.com/ProductDetail/Panasonic/ERA-2AEB101X?qs=sGAEpiMZZMu61qfTUdNhG60TUTbtWM0KfK7kWcCex3w%3D
+
+
+=== Output Voltage Resistors ===
+For 12v line:
+	619 / 47 => 12.0446809v
+	R1 = 619k https://www.mouser.com/ProductDetail/Panasonic/ERA-6AEB6193V?qs=sGAEpiMZZMvdGkrng054txAO1F77ZlZQbHrViC3uPIQ%3D
+	R2 = 47k https://www.mouser.com/ProductDetail/Panasonic/ERA-6AEB473V?qs=sGAEpiMZZMvdGkrng054t%252BKCHBXLTLydydoyC6PfS8c%3D
+
+For 7.2v line:
+	680 / 91 => 7.20165v
+	R1 = 680k = https://www.mouser.com/ProductDetail/Panasonic/ERA-6AEB684V?qs=sGAEpiMZZMvdGkrng054t%252BKCHBXLTLyd1OqRYN%252B9ubs%3D
+	R2 = 91k = https://www.mouser.com/ProductDetail/Panasonic/ERA-6AEB913V?qs=sGAEpiMZZMvdGkrng054tysRcmITJKxoen6wp78Btbg%3D
+
+
+=== Main Inductor ===
+For 12v line:
+	Min = 6.53977
+	Max = 39.2430
+	Mid = 22.89 uH (go with 22)
+		https://www.mouser.com/ProductDetail/Pulse-Electronics/PA4343223NLT?qs=sGAEpiMZZMsg%252By3WlYCkU3EGgopxbfNasRYLW7wgUss%3D
+
+For 7.2v line:
+	Min = -5.460 (so 0)
+	Max = 27.243
+	Mid = 13.6215 uH (go with 15)
+		https://www.mouser.com/ProductDetail/Pulse-Electronics/PA4343153NLT?qs=%2Fha2pyFadujXyxp7VGLc7q18artl9maMeH8s8GGauKA0KUfMuh5JMQ%3D%3D
+
+For 5v line:
+	Min = -10.9602 (so 0)
+	Max = 21.7430
+	Mid = 10.8715 uH (go with 10)
+		https://www.mouser.com/ProductDetail/Pulse-Electronics/PA4343103NLT?qs=%2Fha2pyFadujXyxp7VGLc7pv6uTHG%2F0DcFZ3zGN3R6HFBA1OJ4%2FSy4w%3D%3D
+
+
+
+=== Output Capacitor ===
+For 12v line:
+	Min = 13.4 uF
+	Max = 80 uF
+	Mid = 47 uF https://www.mouser.com/ProductDetail/Murata-Electronics/GRM32EC81C476KE15L?qs=sGAEpiMZZMs0AnBnWHyRQKFZIQ7b73cd63EfyJQmKNumkT%252BX0Vn3tg%3D%3D
+
+For 7.2v line:
+	Min = 22.3 uF
+	Max = 133.3 uF
+	Mid = 47 + 22 for 69?
+		22 = https://www.mouser.com/ProductDetail/Murata-Electronics/GRM319R61C226KE15D?qs=sGAEpiMZZMs0AnBnWHyRQKFZIQ7b73cdhA3AG3nTtEnAerv09prx3A%3D%3D
+		47 = https://www.mouser.com/ProductDetail/Murata-Electronics/GRM32EC81C476KE15L?qs=sGAEpiMZZMs0AnBnWHyRQKFZIQ7b73cd63EfyJQmKNumkT%252BX0Vn3tg%3D%3D
+
+For 5v line:
+	Min = 32.16 uF
+	Max = 192 uF
+	Mid = 47 + 47?
+		https://www.mouser.com/ProductDetail/Murata-Electronics/GRM32EC81C476KE15L?qs=sGAEpiMZZMs0AnBnWHyRQKFZIQ7b73cd63EfyJQmKNumkT%252BX0Vn3tg%3D%3D

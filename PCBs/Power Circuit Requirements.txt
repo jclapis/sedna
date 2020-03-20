@@ -1,0 +1,27 @@
+Circuit requirements!
+
+- An arbitrary 12v input
+	- From a battery i'll make later
+	- From the wall
+
+- 12v line (motor, monitor)
+- 7.2v line (camera)
+- 5v line (pi, AMT22)
+- 3.3v comes from the Pi for all of the other ICs
+	- L6983CQTR for 12 and 7.2
+	- L6983C50QTR for 5
+
+- Measure rail voltages
+	- ADC120IPT (8-channel ADC)
+
+- Current sensing shunt to see what the total current pull is
+	- CS70P
+		https://www.mouser.com/ProductDetail/STMicroelectronics/CS70P?qs=%2Fha2pyFadujb50G2amavD9R4ujkETFCbtIX7CXwzPXA%3D
+	- Resistor = 0.012 ohm, 500 mW
+		https://www.mouser.com/ProductDetail/Vishay-Dale/WSK1206R0120FEA18?qs=sGAEpiMZZMtlleCFQhR%2FzXAltEubt6Tt62KqiEXWA2cgbZCN3KMEcg%3D%3D
+
+- Thermometer
+	- TC77-3.3MOA
+		https://www.mouser.com/ProductDetail/Microchip-Technology/TC77-33MOA?qs=sGAEpiMZZMucenltShoSnjkfRJmEyKRQ02sLMvfJPPQ%3D
+
+- Fuses?
