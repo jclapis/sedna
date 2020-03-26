@@ -12,7 +12,7 @@ Circuit requirements!
 	- L6983C50QTR for 5
 
 - Measure rail voltages
-	- ADC120IPT (8-channel ADC)
+	- MCP3208 (https://www.mouser.com/ProductDetail/Microchip-Technology/MCP3208T-CI-SL?qs=sGAEpiMZZMvTvDTV69d2Qq3ZmnJXANz1FLQTOZoNzBw%3D)
 
 - Current sensing shunt to see what the total current pull is
 	- CS70P
@@ -25,3 +25,9 @@ Circuit requirements!
 		https://www.mouser.com/ProductDetail/Microchip-Technology/TC77-33MOA?qs=sGAEpiMZZMucenltShoSnjkfRJmEyKRQ02sLMvfJPPQ%3D
 
 - Fuses?
+
+NEED DECOUPLING CAPACITORS - 1uF ON EACH VDD PIN
+
+SPRING TERMINALS: EATON EM2795 SERIES (Vertical is way cheaper for some reason)
+	2-pin = EM279502V: https://www.mouser.com/ProductDetail/Bussmann-Eaton/EM279502V?qs=sGAEpiMZZMvPvGwLNS6710D6DvI%252B7E8TYL3MrWMWtJA%3D
+	The rest is stupidly expensive so just build it all out of these.

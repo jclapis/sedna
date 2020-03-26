@@ -92,7 +92,10 @@
 <layer number="111" name="LPC17xx" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="112" name="tSilk" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="113" name="IDFDebug" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="114" name="Badge_Outline" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="115" name="ReferenceISLANDS" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="116" name="Patch_BOT" color="9" fill="4" visible="yes" active="yes"/>
+<layer number="118" name="Rect_Pads" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="121" name="_tsilk" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="122" name="_bsilk" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="123" name="tTestmark" color="7" fill="1" visible="yes" active="yes"/>
@@ -265,6 +268,32 @@ https://www.mouser.com/datasheet/2/281/murata_03052018_GRM_Series_1-1310166.pdf<
 <text x="-3.175" y="1.27" size="1.27" layer="25">&gt;Name</text>
 <text x="-3.175" y="-2.54" size="1.27" layer="27">&gt;Value</text>
 </package>
+<package name="SOIC8">
+<description>SOIC 8-Lead</description>
+<circle x="-2.667" y="-2.032" radius="0.1436" width="0.2032" layer="21"/>
+<wire x1="-2.362" y1="-1.803" x2="2.362" y2="-1.803" width="0.1524" layer="51"/>
+<wire x1="2.362" y1="-1.803" x2="2.362" y2="1.803" width="0.1524" layer="21"/>
+<wire x1="2.362" y1="1.803" x2="-2.362" y2="1.803" width="0.1524" layer="51"/>
+<wire x1="-2.362" y1="1.803" x2="-2.362" y2="-1.803" width="0.1524" layer="21"/>
+<rectangle x1="-2.0828" y1="-2.8702" x2="-1.7272" y2="-1.8542" layer="51"/>
+<rectangle x1="-0.8128" y1="-2.8702" x2="-0.4572" y2="-1.8542" layer="51"/>
+<rectangle x1="0.4572" y1="-2.8702" x2="0.8128" y2="-1.8542" layer="51"/>
+<rectangle x1="1.7272" y1="-2.8702" x2="2.0828" y2="-1.8542" layer="51"/>
+<rectangle x1="-2.0828" y1="1.8542" x2="-1.7272" y2="2.8702" layer="51"/>
+<rectangle x1="-0.8128" y1="1.8542" x2="-0.4572" y2="2.8702" layer="51"/>
+<rectangle x1="0.4572" y1="1.8542" x2="0.8128" y2="2.8702" layer="51"/>
+<rectangle x1="1.7272" y1="1.8542" x2="2.0828" y2="2.8702" layer="51"/>
+<smd name="1" x="-1.905" y="-2.6162" dx="0.6096" dy="2.2098" layer="1"/>
+<smd name="2" x="-0.635" y="-2.6162" dx="0.6096" dy="2.2098" layer="1"/>
+<smd name="3" x="0.635" y="-2.6162" dx="0.6096" dy="2.2098" layer="1"/>
+<smd name="4" x="1.905" y="-2.6162" dx="0.6096" dy="2.2098" layer="1"/>
+<smd name="5" x="1.905" y="2.6162" dx="0.6096" dy="2.2098" layer="1"/>
+<smd name="6" x="0.635" y="2.6162" dx="0.6096" dy="2.2098" layer="1"/>
+<smd name="7" x="-0.635" y="2.6162" dx="0.6096" dy="2.2098" layer="1"/>
+<smd name="8" x="-1.905" y="2.6162" dx="0.6096" dy="2.2098" layer="1"/>
+<text x="-1.27" y="-0.635" size="0.4064" layer="27">&gt;VALUE</text>
+<text x="-1.27" y="0" size="0.4064" layer="25">&gt;NAME</text>
+</package>
 </packages>
 <symbols>
 <symbol name="L6983">
@@ -356,6 +385,22 @@ https://www.st.com/resource/en/datasheet/cs70.pdf</description>
 <text x="-3.81" y="-3.302" size="1.778" layer="96">&gt;VALUE</text>
 <pin name="2" x="5.08" y="0" visible="off" length="short" direction="pas" swaplevel="1" rot="R180"/>
 <pin name="1" x="-5.08" y="0" visible="off" length="short" direction="pas" swaplevel="1"/>
+</symbol>
+<symbol name="TC77">
+<wire x1="-10.16" y1="5.08" x2="-10.16" y2="-7.62" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-7.62" x2="10.16" y2="-7.62" width="0.254" layer="94"/>
+<wire x1="10.16" y1="-7.62" x2="10.16" y2="5.08" width="0.254" layer="94"/>
+<wire x1="10.16" y1="5.08" x2="-10.16" y2="5.08" width="0.254" layer="94"/>
+<pin name="SI/O" x="-12.7" y="2.54" visible="pin" length="short" direction="out"/>
+<pin name="SCK" x="-12.7" y="0" visible="pin" length="short" direction="in"/>
+<pin name="NC@3" x="-12.7" y="-2.54" visible="pin" length="short" direction="nc"/>
+<pin name="VSS" x="-12.7" y="-5.08" visible="pin" length="short" direction="pwr"/>
+<pin name="NC@5" x="12.7" y="-5.08" visible="pin" length="short" direction="nc" rot="R180"/>
+<pin name="NC@6" x="12.7" y="-2.54" visible="pin" length="short" direction="nc" rot="R180"/>
+<pin name="CS" x="12.7" y="0" visible="pin" length="short" direction="in" rot="R180"/>
+<pin name="VDD" x="12.7" y="2.54" visible="pin" length="short" direction="pwr" rot="R180"/>
+<text x="-10.16" y="7.62" size="1.778" layer="95">&gt;Name</text>
+<text x="-10.16" y="-11.938" size="1.778" layer="96">&gt;Value</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -481,6 +526,29 @@ https://www.mouser.com/datasheet/2/427/wsk120618-1763045.pdf</description>
 <connects>
 <connect gate="G$1" pin="1" pad="P$1 P$2"/>
 <connect gate="G$1" pin="2" pad="P$3 P$4"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="TC77" prefix="U">
+<description>The TC77 is a digital temperature sensor: https://www.mouser.com/datasheet/2/268/20092a-72501.pdf</description>
+<gates>
+<gate name="G$1" symbol="TC77" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SOIC8">
+<connects>
+<connect gate="G$1" pin="CS" pad="7"/>
+<connect gate="G$1" pin="NC@3" pad="3"/>
+<connect gate="G$1" pin="NC@5" pad="5"/>
+<connect gate="G$1" pin="NC@6" pad="6"/>
+<connect gate="G$1" pin="SCK" pad="2"/>
+<connect gate="G$1" pin="SI/O" pad="1"/>
+<connect gate="G$1" pin="VDD" pad="8"/>
+<connect gate="G$1" pin="VSS" pad="4"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -19528,6 +19596,7 @@ LETTER landscape</description>
 <part name="R_SENSE" library="Sedna Components" deviceset="WSK1206" device="" value="12mΩ, 1%, 300mW"/>
 <part name="SUPPLY2" library="Sedna Components" deviceset="VIN/VOUT_2" device="" value="+3.3V IN"/>
 <part name="GND9" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
+<part name="TEMP_SENSOR" library="Sedna Components" deviceset="TC77" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -19724,6 +19793,10 @@ LETTER landscape</description>
 </instance>
 <instance part="GND9" gate="1" x="10.16" y="43.18" smashed="yes">
 <attribute name="VALUE" x="7.62" y="40.64" size="1.778" layer="96"/>
+</instance>
+<instance part="TEMP_SENSOR" gate="G$1" x="30.48" y="17.78" smashed="yes">
+<attribute name="NAME" x="20.32" y="23.876" size="1.778" layer="95"/>
+<attribute name="VALUE" x="20.32" y="7.62" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
