@@ -1,6 +1,6 @@
 ** Assuming between 12.5v and 36v in, 400 kHz **
 
-R_FILT = https://www.mouser.com/ProductDetail/Panasonic/ERA-2AEB101X?qs=sGAEpiMZZMu61qfTUdNhG60TUTbtWM0KfK7kWcCex3w%3D
+R_FILT = https://www.mouser.com/ProductDetail/Panasonic/ERA-6AEB101V?qs=%2Fha2pyFadugMccic%2FTHB4jxeO1OBRQUph0KrBrImMtC3%252Byu9d8jaxA%3D%3D
 
 
 === Output Voltage Resistors ===
@@ -14,25 +14,30 @@ For 7.2v line:
 	R1 = 680k = https://www.mouser.com/ProductDetail/Panasonic/ERA-6AEB684V?qs=sGAEpiMZZMvdGkrng054t%252BKCHBXLTLyd1OqRYN%252B9ubs%3D
 	R2 = 91k = https://www.mouser.com/ProductDetail/Panasonic/ERA-6AEB913V?qs=sGAEpiMZZMvdGkrng054tysRcmITJKxoen6wp78Btbg%3D
 
+For 5v line:
+	402 / 82 => 5.017073v
+	R1 = 402k = https://www.mouser.com/ProductDetail/Panasonic/ERA-6AEB4023V?qs=sGAEpiMZZMvdGkrng054txAO1F77ZlZQ8R0I9E1%2FbBg%3D
+	R2 = 82k = https://www.mouser.com/ProductDetail/Panasonic/ERA-6AEB823V?qs=sGAEpiMZZMvdGkrng054tysRcmITJKxoBfxHTzMcu7Q%3D
+
 
 === Main Inductor ===
 For 12v line:
 	Min = 6.53977
 	Max = 39.2430
 	Mid = 22.89 uH (go with 22)
-		https://www.mouser.com/ProductDetail/Pulse-Electronics/PA4343223NLT?qs=sGAEpiMZZMsg%252By3WlYCkU3EGgopxbfNasRYLW7wgUss%3D
+		https://www.mouser.com/ProductDetail/Pulse-Electronics/PA4343223NLT?qs=%2Fha2pyFadugFdPy81yLNcYN1iu2nhyeYd6g2oizJF2iUMEj%252Bh5Unlg%3D%3D
 
 For 7.2v line:
 	Min = -5.460 (so 0)
 	Max = 27.243
 	Mid = 13.6215 uH (go with 15)
-		https://www.mouser.com/ProductDetail/Pulse-Electronics/PA4343153NLT?qs=%2Fha2pyFadujXyxp7VGLc7q18artl9maMeH8s8GGauKA0KUfMuh5JMQ%3D%3D
+		https://www.mouser.com/ProductDetail/Pulse-Electronics/PM4343153NLT?qs=%2Fha2pyFadui1HcGHjovc1PhaaSpKIl36rIHogXQ4%252BYxN5BPB6lH3WA%3D%3D
 
 For 5v line:
 	Min = -10.9602 (so 0)
 	Max = 21.7430
 	Mid = 10.8715 uH (go with 10)
-		https://www.mouser.com/ProductDetail/Pulse-Electronics/PA4343103NLT?qs=%2Fha2pyFadujXyxp7VGLc7pv6uTHG%2F0DcFZ3zGN3R6HFBA1OJ4%2FSy4w%3D%3D
+		https://www.mouser.com/ProductDetail/Pulse-Electronics/PM4343103NLT?qs=%2Fha2pyFadui1HcGHjovc1JQhuzHhpddvYKm6qWFp6SdkrTwudW%2Fpew%3D%3D
 
 
 
