@@ -395,6 +395,15 @@ https://my.st.com/resource/en/datasheet/l6983.pdf</description>
 <technology name=""/>
 </technologies>
 </device>
+<device name="ALT_POLARITY" package="EM279502V">
+<connects>
+<connect gate="G$1" pin="GND" pad="1A 1B"/>
+<connect gate="G$1" pin="VIN" pad="2A 2B"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
 </devices>
 </deviceset>
 <deviceset name="PA4343_FP2" prefix="L" uservalue="yes">
@@ -8648,8 +8657,10 @@ drill 1.3 mm</description>
 </classes>
 <parts>
 <part name="FRAME1" library="frames" library_urn="urn:adsk.eagle:library:229" deviceset="LETTER_L" device=""/>
-<part name="REGULATOR" library="Sedna Components" deviceset="L6983" device=""/>
-<part name="POWER_IN" library="Sedna Components" deviceset="EM279502V" device=""/>
+<part name="REGULATOR" library="Sedna Components" deviceset="L6983" device="">
+<attribute name="SPICEPREFIX" value="X"/>
+</part>
+<part name="IN" library="Sedna Components" deviceset="EM279502V" device="ALT_POLARITY" value="EM279502VALT_POLARITY"/>
 <part name="GND1" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND2" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="C_VCC" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="1μF, 16V"/>
@@ -8665,15 +8676,13 @@ drill 1.3 mm</description>
 <part name="GND3" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="C_OUT_1" library="Sedna Components" deviceset="TDK_C2220_5750" device=""/>
 <part name="C_OUT_2" library="Sedna Components" deviceset="TDK_C2220_5750" device=""/>
-<part name="R_PGOOD" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="1000kΩ"/>
 <part name="GND4" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="POWER_OUT" library="Sedna Components" deviceset="EM279502V" device=""/>
+<part name="OUT" library="Sedna Components" deviceset="EM279502V" device=""/>
 <part name="GND5" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="VSENSE_OUT" library="SparkFun-Connectors" deviceset="M01" device="PTH" value="0.1&quot; Header"/>
 <part name="GND_VIA1" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP13" device="" package3d_urn="urn:adsk.eagle:package:26509/1"/>
-<part name="VOUT_VIA" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP13" device="" package3d_urn="urn:adsk.eagle:package:26509/1"/>
+<part name="SW_OUT_VIA" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP13" device="" package3d_urn="urn:adsk.eagle:package:26509/1"/>
 <part name="GND_VIA2" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP13" device="" package3d_urn="urn:adsk.eagle:package:26509/1"/>
-<part name="GND_VIA3" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP13" device="" package3d_urn="urn:adsk.eagle:package:26509/1"/>
 <part name="VIN_VIA2" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP13" device="" package3d_urn="urn:adsk.eagle:package:26509/1"/>
 <part name="VIN_VIA1" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP13" device="" package3d_urn="urn:adsk.eagle:package:26509/1"/>
 </parts>
@@ -8681,7 +8690,7 @@ drill 1.3 mm</description>
 <sheet>
 <plain>
 <text x="180.34" y="11.43" size="2.54" layer="94">Sedna 01</text>
-<text x="239.776" y="6.858" size="2.54" layer="94">01</text>
+<text x="239.776" y="6.858" size="2.54" layer="94">1.2</text>
 <text x="148.59" y="28.194" size="2.54" layer="94">Copyright (C) 2020 Joe Clapis. All rights reserved.</text>
 </plain>
 <instances>
@@ -8695,8 +8704,8 @@ drill 1.3 mm</description>
 <attribute name="NAME" x="96.52" y="112.522" size="1.778" layer="95"/>
 <attribute name="VALUE" x="96.52" y="83.82" size="1.778" layer="96"/>
 </instance>
-<instance part="POWER_IN" gate="G$1" x="20.32" y="114.3" smashed="yes">
-<attribute name="VALUE" x="15.24" y="108.966" size="1.778" layer="96"/>
+<instance part="IN" gate="G$1" x="20.32" y="114.3" smashed="yes">
+<attribute name="VALUE" x="13.462" y="102.616" size="1.778" layer="96" rot="R90"/>
 <attribute name="NAME" x="15.494" y="120.396" size="1.778" layer="95"/>
 </instance>
 <instance part="GND1" gate="1" x="30.48" y="106.68" smashed="yes">
@@ -8756,14 +8765,10 @@ drill 1.3 mm</description>
 <attribute name="NAME" x="192.405" y="89.154" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="189.484" y="91.821" size="1.778" layer="96"/>
 </instance>
-<instance part="R_PGOOD" gate="G$1" x="175.006" y="109.22" smashed="yes">
-<attribute name="NAME" x="168.91" y="110.7186" size="1.778" layer="95"/>
-<attribute name="VALUE" x="170.942" y="105.664" size="1.778" layer="96"/>
-</instance>
 <instance part="GND4" gate="1" x="167.64" y="68.58" smashed="yes">
 <attribute name="VALUE" x="165.1" y="66.04" size="1.778" layer="96"/>
 </instance>
-<instance part="POWER_OUT" gate="G$1" x="220.98" y="106.68" smashed="yes" rot="R180">
+<instance part="OUT" gate="G$1" x="220.98" y="106.68" smashed="yes" rot="R180">
 <attribute name="VALUE" x="229.87" y="100.584" size="1.778" layer="96" rot="R180"/>
 <attribute name="NAME" x="232.41" y="112.014" size="1.778" layer="95" rot="R180"/>
 </instance>
@@ -8777,14 +8782,11 @@ drill 1.3 mm</description>
 <instance part="GND_VIA1" gate="1" x="119.38" y="66.04" smashed="yes">
 <attribute name="NAME" x="113.03" y="69.215" size="1.778" layer="95"/>
 </instance>
-<instance part="VOUT_VIA" gate="1" x="205.74" y="91.44" smashed="yes">
-<attribute name="NAME" x="202.438" y="85.471" size="1.778" layer="95"/>
+<instance part="SW_OUT_VIA" gate="1" x="147.32" y="106.68" smashed="yes">
+<attribute name="NAME" x="146.558" y="110.871" size="1.778" layer="95"/>
 </instance>
 <instance part="GND_VIA2" gate="1" x="124.46" y="66.04" smashed="yes">
 <attribute name="NAME" x="118.618" y="61.087" size="1.778" layer="95"/>
-</instance>
-<instance part="GND_VIA3" gate="1" x="129.54" y="66.04" smashed="yes">
-<attribute name="NAME" x="128.524" y="69.215" size="1.778" layer="95"/>
 </instance>
 <instance part="VIN_VIA2" gate="1" x="71.12" y="119.38" smashed="yes">
 <attribute name="NAME" x="66.294" y="122.555" size="1.778" layer="95"/>
@@ -8798,7 +8800,7 @@ drill 1.3 mm</description>
 <nets>
 <net name="GND" class="0">
 <segment>
-<pinref part="POWER_IN" gate="G$1" pin="GND"/>
+<pinref part="IN" gate="G$1" pin="GND"/>
 <pinref part="GND1" gate="1" pin="GND"/>
 <wire x1="27.94" y1="114.3" x2="30.48" y2="114.3" width="0.1524" layer="91"/>
 <wire x1="30.48" y1="114.3" x2="30.48" y2="109.22" width="0.1524" layer="91"/>
@@ -8855,9 +8857,6 @@ drill 1.3 mm</description>
 <pinref part="GND_VIA2" gate="1" pin="MP"/>
 <wire x1="119.38" y1="63.5" x2="124.46" y2="63.5" width="0.1524" layer="91"/>
 <junction x="119.38" y="63.5"/>
-<pinref part="GND_VIA3" gate="1" pin="MP"/>
-<wire x1="124.46" y1="63.5" x2="129.54" y2="63.5" width="0.1524" layer="91"/>
-<junction x="124.46" y="63.5"/>
 </segment>
 <segment>
 <pinref part="R_FBL" gate="G$1" pin="2"/>
@@ -8876,7 +8875,7 @@ drill 1.3 mm</description>
 <junction x="185.42" y="88.9"/>
 </segment>
 <segment>
-<pinref part="POWER_OUT" gate="G$1" pin="GND"/>
+<pinref part="OUT" gate="G$1" pin="GND"/>
 <wire x1="213.36" y1="106.68" x2="200.66" y2="106.68" width="0.1524" layer="91"/>
 <pinref part="GND5" gate="1" pin="GND"/>
 <wire x1="200.66" y1="106.68" x2="200.66" y2="86.36" width="0.1524" layer="91"/>
@@ -8894,7 +8893,7 @@ drill 1.3 mm</description>
 <segment>
 <pinref part="REGULATOR" gate="U1" pin="EN/CLKIN"/>
 <pinref part="REGULATOR" gate="U1" pin="VIN@1"/>
-<pinref part="POWER_IN" gate="G$1" pin="VIN"/>
+<pinref part="IN" gate="G$1" pin="VIN"/>
 <wire x1="27.94" y1="116.84" x2="38.1" y2="116.84" width="0.1524" layer="91"/>
 <wire x1="38.1" y1="116.84" x2="45.72" y2="116.84" width="0.1524" layer="91"/>
 <wire x1="45.72" y1="116.84" x2="58.42" y2="116.84" width="0.1524" layer="91"/>
@@ -8954,7 +8953,10 @@ drill 1.3 mm</description>
 <wire x1="144.78" y1="101.6" x2="144.78" y2="104.14" width="0.1524" layer="91"/>
 <junction x="144.78" y="104.14"/>
 <pinref part="L_OUT" gate="G$1" pin="1"/>
-<wire x1="144.78" y1="104.14" x2="149.86" y2="104.14" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="104.14" x2="147.32" y2="104.14" width="0.1524" layer="91"/>
+<pinref part="SW_OUT_VIA" gate="1" pin="MP"/>
+<wire x1="147.32" y1="104.14" x2="149.86" y2="104.14" width="0.1524" layer="91"/>
+<junction x="147.32" y="104.14"/>
 </segment>
 </net>
 <net name="V_OUT" class="0">
@@ -8974,22 +8976,14 @@ drill 1.3 mm</description>
 <junction x="182.88" y="104.14"/>
 <pinref part="C_OUT_2" gate="G$1" pin="1"/>
 <wire x1="187.96" y1="104.14" x2="187.96" y2="99.06" width="0.1524" layer="91"/>
-<wire x1="187.96" y1="104.14" x2="193.04" y2="104.14" width="0.1524" layer="91"/>
 <junction x="187.96" y="104.14"/>
-<pinref part="R_PGOOD" gate="G$1" pin="2"/>
-<wire x1="193.04" y1="104.14" x2="210.82" y2="104.14" width="0.1524" layer="91"/>
+<wire x1="187.96" y1="104.14" x2="210.82" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="210.82" y1="104.14" x2="213.36" y2="104.14" width="0.1524" layer="91"/>
-<wire x1="180.086" y1="109.22" x2="193.04" y2="109.22" width="0.1524" layer="91"/>
-<wire x1="193.04" y1="109.22" x2="193.04" y2="104.14" width="0.1524" layer="91"/>
-<junction x="193.04" y="104.14"/>
-<pinref part="POWER_OUT" gate="G$1" pin="VIN"/>
+<pinref part="OUT" gate="G$1" pin="VIN"/>
 <pinref part="VSENSE_OUT" gate="G$1" pin="1"/>
 <wire x1="210.82" y1="104.14" x2="210.82" y2="88.9" width="0.1524" layer="91"/>
 <wire x1="210.82" y1="88.9" x2="213.36" y2="88.9" width="0.1524" layer="91"/>
 <junction x="210.82" y="104.14"/>
-<pinref part="VOUT_VIA" gate="1" pin="MP"/>
-<wire x1="210.82" y1="88.9" x2="205.74" y2="88.9" width="0.1524" layer="91"/>
-<junction x="210.82" y="88.9"/>
 </segment>
 </net>
 <net name="FB" class="0">
@@ -9003,13 +8997,6 @@ drill 1.3 mm</description>
 <wire x1="129.54" y1="96.52" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="144.78" y1="96.52" x2="144.78" y2="86.36" width="0.1524" layer="91"/>
 <wire x1="144.78" y1="86.36" x2="167.64" y2="86.36" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="PGOOD_OUT" class="0">
-<segment>
-<pinref part="REGULATOR" gate="U1" pin="PGOOD"/>
-<pinref part="R_PGOOD" gate="G$1" pin="1"/>
-<wire x1="129.54" y1="109.22" x2="169.926" y2="109.22" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
