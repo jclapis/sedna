@@ -221,22 +221,22 @@ LETTER landscape</description>
 <wire x1="1.5" y1="-1.5" x2="-1.5" y2="-1.5" width="0.127" layer="51"/>
 <wire x1="-1.5" y1="-1.5" x2="-1.5" y2="1.5" width="0.127" layer="51"/>
 <smd name="E.P." x="0" y="0.17" dx="0.5" dy="0.9" layer="1"/>
-<smd name="13_PGND" x="-0.75" y="-1.475" dx="0.3" dy="0.85" layer="1"/>
-<smd name="14_SW" x="-0.25" y="-1.475" dx="0.3" dy="0.85" layer="1"/>
-<smd name="15_SW" x="0.25" y="-1.475" dx="0.3" dy="0.85" layer="1"/>
-<smd name="16_PGND" x="0.75" y="-1.475" dx="0.3" dy="0.85" layer="1"/>
-<smd name="5_PGOOD" x="0.75" y="1.475" dx="0.3" dy="0.85" layer="1"/>
-<smd name="6_VBIAS" x="0.25" y="1.475" dx="0.3" dy="0.85" layer="1"/>
-<smd name="7_FB/VOUT" x="-0.25" y="1.475" dx="0.3" dy="0.85" layer="1"/>
-<smd name="8_FSW" x="-0.75" y="1.475" dx="0.3" dy="0.85" layer="1"/>
-<smd name="9_VCC" x="-1.475" y="0.75" dx="0.85" dy="0.3" layer="1"/>
-<smd name="10_AGND" x="-1.475" y="0.25" dx="0.85" dy="0.3" layer="1"/>
-<smd name="11_BOOT" x="-1.475" y="-0.25" dx="0.85" dy="0.3" layer="1"/>
-<smd name="12_VIN" x="-1.475" y="-0.75" dx="0.85" dy="0.3" layer="1"/>
-<smd name="4_EN/CLKIN" x="1.475" y="0.75" dx="0.85" dy="0.3" layer="1"/>
-<smd name="3_AGND" x="1.475" y="0.25" dx="0.85" dy="0.3" layer="1"/>
-<smd name="2_VINLDO" x="1.475" y="-0.25" dx="0.85" dy="0.3" layer="1"/>
-<smd name="1_VIN" x="1.475" y="-0.75" dx="0.85" dy="0.3" layer="1"/>
+<smd name="13_PGND" x="-0.75" y="-1.475" dx="0.25" dy="0.85" layer="1"/>
+<smd name="14_SW" x="-0.25" y="-1.475" dx="0.25" dy="0.85" layer="1"/>
+<smd name="15_SW" x="0.25" y="-1.475" dx="0.25" dy="0.85" layer="1"/>
+<smd name="16_PGND" x="0.75" y="-1.475" dx="0.25" dy="0.85" layer="1"/>
+<smd name="5_PGOOD" x="0.75" y="1.475" dx="0.25" dy="0.85" layer="1"/>
+<smd name="6_VBIAS" x="0.25" y="1.475" dx="0.25" dy="0.85" layer="1"/>
+<smd name="7_FB/VOUT" x="-0.25" y="1.475" dx="0.25" dy="0.85" layer="1"/>
+<smd name="8_FSW" x="-0.75" y="1.475" dx="0.25" dy="0.85" layer="1"/>
+<smd name="9_VCC" x="-1.475" y="0.75" dx="0.85" dy="0.25" layer="1"/>
+<smd name="10_AGND" x="-1.475" y="0.25" dx="0.85" dy="0.25" layer="1"/>
+<smd name="11_BOOT" x="-1.475" y="-0.25" dx="0.85" dy="0.25" layer="1"/>
+<smd name="12_VIN" x="-1.475" y="-0.75" dx="0.85" dy="0.25" layer="1"/>
+<smd name="4_EN/CLKIN" x="1.475" y="0.75" dx="0.85" dy="0.25" layer="1"/>
+<smd name="3_AGND" x="1.475" y="0.25" dx="0.85" dy="0.25" layer="1"/>
+<smd name="2_VINLDO" x="1.475" y="-0.25" dx="0.85" dy="0.25" layer="1"/>
+<smd name="1_VIN" x="1.475" y="-0.75" dx="0.85" dy="0.25" layer="1"/>
 <text x="2.2" y="0.8" size="0.75" layer="27">&gt;Value</text>
 <text x="2.2" y="-1.6" size="0.75" layer="25">&gt;Name</text>
 </package>
